@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Amira — Your Mundiapolis Guide</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..700&family=Spline+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css">
   <script type="importmap">
   {
@@ -16,30 +18,27 @@
   </script>
 </head>
 <body>
-  <div class="app">
-    <!-- Left side: branding + hero (later this becomes the VR tour) -->
-    <div class="hero">
-      <div class="hero-content">
-        <div class="badge">✨ Virtual Campus Tour</div>
-        <h1>Welcome to <span class="highlight">our Chatbot</span></h1>
-        <p class="subtitle">Meet Amira, your personal guide. Ask her anything about life on campus — programs, admissions, student life. She's here to help.</p>
-        <div class="features">
-          <div class="feature">🎓 Programs &amp; Admissions</div>
-          <div class="feature">🏛️ Campus &amp; Facilities</div>
-          <div class="feature">🌍 Student Life</div>
-        </div>
-      </div>
+  <div class="amira-shell">
+
+    <!-- LEFT: editorial copy -->
+    <div class="amira-copy">
+      <div class="eyebrow">Mundiapolis University · Casablanca</div>
+      <h1 class="amira-title">Your guide,<br><em>Amira</em></h1>
+      <p class="amira-lead">She talks like a student who actually goes here — ask her about programs, admissions, or what the library's like during exams. English, French, or Arabic.</p>
+      <ul class="amira-list">
+        <li><span class="n">01</span><span>Programs &amp; Admissions</span></li>
+        <li><span class="n">02</span><span>Campus &amp; Facilities</span></li>
+        <li><span class="n">03</span><span>Student Life</span></li>
+      </ul>
     </div>
 
-    <!-- Right side: chat interface -->
-    <div class="chat-container">
+    <!-- RIGHT: chat card -->
+    <div class="chat-card">
       <div class="chat-header">
-        <div class="avatar-circle" id="avatar-header-mount">
-          <canvas id="avatar-header-canvas"></canvas>
-        </div>
-        <div class="header-info">
-          <div class="header-name">Amira</div>
-          <div class="header-status"><span class="status-dot"></span> Online</div>
+        <div class="avatar-circle" id="avatar-header-mount"></div>
+        <div class="head-info">
+          <div class="nm">Amira</div>
+          <div class="st">Online</div>
         </div>
         <button id="voice-toggle" class="voice-toggle" title="Mute voice">🔊</button>
       </div>
@@ -60,15 +59,16 @@
       </div>
 
       <div class="input-area">
-        <input type="text" id="user-input" placeholder="Ask Amira anything..." autocomplete="off" maxlength="2000">
+        <input type="text" id="user-input" placeholder="Ask Amira anything…" autocomplete="off" maxlength="2000">
         <button id="mic-btn" title="Voice input">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
         </button>
         <button id="send-btn" title="Send">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         </button>
       </div>
     </div>
+
   </div>
 
   <script src="chatbot.js"></script>

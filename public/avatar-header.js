@@ -15,6 +15,8 @@ async function initHeaderAvatar() {
       avatarMood: 'neutral',
       cameraDistance: 0.4,
       cameraPanY: 0.1,
+      modelPixelRatio: 1,
+      lightAmbientIntensity: 2,
     });
 
     await head.showAvatar({
@@ -24,12 +26,14 @@ async function initHeaderAvatar() {
       lipsyncLang: 'fr',
     });
 
+    // Static photo served its purpose — let the 3D canvas show
+    container.style.background = 'transparent';
     window._talkingHead = head;
     console.log('Header avatar ready');
 
   } catch(e) {
     console.error('Header avatar failed:', e);
-    container.innerHTML = '<div class="avatar-pulse"></div><span>A</span>';
+    // Static photo stays visible as fallback — no action needed
   }
 }
 
@@ -48,4 +52,19 @@ export async function speakWithHead(audioUrl, lang = 'fr') {
   }
 }
 
-initHeaderAvatar();
+// Lazy init: start 3D only when user first focuses the input
+// Static photo shows until then — no render cost on page load
+let started = false;
+function startAvatarOnce() {
+  if (started) return;
+  started = true;
+  initHeaderAvatar();
+}
+
+const input = document.getElementById('user-input');
+if (input) {
+  input.addEventListener('focus', startAvatarOnce, { once: true });
+} else {
+  // Fallback: init after a short delay if input not found
+  setTimeout(initHeaderAvatar, 1000);
+}

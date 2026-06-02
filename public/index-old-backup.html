@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <title>Mundiapolis 360° Virtual Tour</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange: #FF6B2B;
+      --yellow: #FFD23F;
+      --teal: #0ABFBC;
+      --dark: #0D0D0D;
+      --white: #FFFFFF;
+      --gray: #F5F5F5;
+      --text: #1A1A1A;
+      --muted: #666;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      background: var(--white);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      width: 12px; height: 12px;
+      background: var(--orange);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease;
+      transform: translate(-50%, -50%);
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 2px solid var(--orange);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      transition: all 0.1s ease;
+      transform: translate(-50%, -50%);
+      opacity: 0.5;
+    }
+
+    /* ─── NAVBAR ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 1000;
+      padding: 1.2rem 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: all 0.4s ease;
+    }
+    nav.scrolled {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 2px 30px rgba(0,0,0,0.08);
+      padding: 0.9rem 5%;
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: var(--white);
+      text-decoration: none;
+      transition: color 0.4s;
+    }
+    nav.scrolled .nav-logo { color: var(--dark); }
+    .nav-logo span { color: var(--orange); }
+
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.85);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    nav.scrolled .nav-links a { color: var(--text); }
+    .nav-links a:hover { color: var(--orange); }
+
+    .nav-cta {
+      background: var(--orange);
+      color: var(--white) !important;
+      padding: 0.55rem 1.4rem;
+      border-radius: 50px;
+      font-weight: 600 !important;
+      transition: transform 0.2s, box-shadow 0.2s !important;
+    }
+    .nav-cta:hover { transform: scale(1.05) !important; box-shadow: 0 4px 20px rgba(255,107,43,0.4) !important; }
+
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { width: 24px; height: 2px; background: white; transition: all 0.3s; border-radius: 2px; }
+    nav.scrolled .hamburger span { background: var(--dark); }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0D0D0D 0%, #1a1a2e 40%, #16213e 70%, #0f3460 100%);
+      display: flex; align-items: center;
+      position: relative; overflow: hidden;
+      padding: 0 5%;
+    }
+
+    .hero-bg-circles {
+      position: absolute; inset: 0; pointer-events: none;
+    }
+    .circle {
+      position: absolute; border-radius: 50%;
+      animation: float 8s ease-in-out infinite;
+    }
+    .circle-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,107,43,0.15), transparent 70%); top: -100px; right: -100px; }
+    .circle-2 { width: 350px; height: 350px; background: radial-gradient(circle, rgba(10,191,188,0.12), transparent 70%); bottom: 50px; left: 10%; animation-delay: -3s; }
+    .circle-3 { width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,210,63,0.1), transparent 70%); top: 40%; right: 25%; animation-delay: -5s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-30px) scale(1.05); }
+    }
+
+    .grid-overlay {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    .hero-content { position: relative; z-index: 2; max-width: 700px; }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(255,107,43,0.15);
+      border: 1px solid rgba(255,107,43,0.3);
+      color: var(--orange);
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 0.8s ease forwards;
+    }
+    .hero-badge::before { content: '●'; font-size: 0.6rem; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .hero-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 0.8s 0.2s ease both;
+    }
+    .hero-title .highlight {
+      background: linear-gradient(135deg, var(--orange), var(--yellow));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.7;
+      max-width: 520px;
+      margin-bottom: 2.5rem;
+      font-weight: 300;
+      animation: fadeInUp 0.8s 0.4s ease both;
+    }
+
+    .hero-buttons {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      animation: fadeInUp 0.8s 0.6s ease both;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--orange), #ff8c5a);
+      color: white;
+      padding: 0.9rem 2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1rem;
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      transition: transform 0.25s, box-shadow 0.25s;
+      box-shadow: 0 8px 30px rgba(255,107,43,0.4);
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(255,107,43,0.5); }
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      padding: 0.9rem 2rem;
+      border-radius: 50px;
+      font-weight: 500;
+      font-size: 1rem;
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      transition: all 0.25s;
+      backdrop-filter: blur(10px);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.15); transform: translateY(-3px); }
+
+    .hero-stats {
+      display: flex; gap: 2.5rem; margin-top: 3.5rem;
+      animation: fadeInUp 0.8s 0.8s ease both;
+    }
+    .stat-number {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1;
+    }
+    .stat-number span { color: var(--orange); }
+    .stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.45); margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+    .hero-visual {
+      position: absolute; right: 5%; top: 50%; transform: translateY(-50%);
+      width: 420px; height: 420px;
+      animation: fadeInUp 0.8s 0.5s ease both;
+    }
+    .tour-preview-circle {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255,107,43,0.2), rgba(10,191,188,0.2));
+      border: 2px solid rgba(255,107,43,0.3);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      animation: spin-slow 20s linear infinite;
+    }
+    .tour-preview-inner {
+      width: 85%; height: 85%;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 0.5rem;
+      animation: spin-slow 20s linear infinite reverse;
+    }
+    .tour-icon { font-size: 4rem; }
+    .tour-preview-inner p { color: rgba(255,255,255,0.6); font-size: 0.85rem; }
+
+    @keyframes spin-slow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+    .orbit-dot {
+      position: absolute; width: 12px; height: 12px;
+      background: var(--orange); border-radius: 50%;
+      box-shadow: 0 0 10px var(--orange);
+    }
+    .orbit-dot:nth-child(1) { top: 10%; left: 50%; }
+    .orbit-dot:nth-child(2) { bottom: 10%; left: 50%; background: var(--teal); box-shadow: 0 0 10px var(--teal); }
+    .orbit-dot:nth-child(3) { left: 10%; top: 50%; background: var(--yellow); box-shadow: 0 0 10px var(--yellow); }
+
+    .scroll-hint {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      color: rgba(255,255,255,0.4); font-size: 0.75rem; letter-spacing: 0.1em;
+      text-transform: uppercase; animation: fadeInUp 1s 1.2s ease both;
+    }
+    .scroll-arrow { width: 20px; height: 20px; border-right: 2px solid rgba(255,255,255,0.3); border-bottom: 2px solid rgba(255,255,255,0.3); transform: rotate(45deg); animation: bounce 2s infinite; }
+    @keyframes bounce { 0%,100%{transform:rotate(45deg) translateY(0)} 50%{transform:rotate(45deg) translateY(6px)} }
+
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ─── ABOUT ─── */
+    #about {
+      padding: 7rem 5%;
+      background: var(--gray);
+    }
+    .section-tag {
+      display: inline-block;
+      font-size: 0.8rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--orange);
+      margin-bottom: 0.8rem;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 1.2rem;
+    }
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+    }
+    .about-text p {
+      font-size: 1.05rem; line-height: 1.8; color: var(--muted); margin-bottom: 1rem;
+    }
+    .about-cards { display: flex; flex-direction: column; gap: 1rem; }
+    .about-card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex; gap: 1.2rem; align-items: flex-start;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .about-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+    .about-card-icon {
+      width: 48px; height: 48px; min-width: 48px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+    .icon-orange { background: rgba(255,107,43,0.12); }
+    .icon-teal { background: rgba(10,191,188,0.12); }
+    .icon-yellow { background: rgba(255,210,63,0.15); }
+    .about-card h4 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 0.3rem; }
+    .about-card p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+
+    /* ─── FEATURES ─── */
+    #features {
+      padding: 7rem 5%;
+      background: var(--white);
+    }
+    .features-header { text-align: center; margin-bottom: 4rem; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .feature-card {
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      position: relative; overflow: hidden;
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+      cursor: default;
+    }
+    .feature-card:hover { transform: translateY(-8px) scale(1.01); }
+    .feature-card.card-dark {
+      background: var(--dark);
+      color: white;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .feature-card.card-orange {
+      background: linear-gradient(135deg, var(--orange), #ff8c5a);
+      color: white;
+      box-shadow: 0 20px 60px rgba(255,107,43,0.35);
+    }
+    .feature-card.card-light {
+      background: var(--gray);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    }
+    .feature-card .card-glow {
+      position: absolute; top: -50px; right: -50px;
+      width: 200px; height: 200px; border-radius: 50%;
+      pointer-events: none;
+    }
+    .card-dark .card-glow { background: radial-gradient(circle, rgba(10,191,188,0.15), transparent); }
+    .card-orange .card-glow { background: radial-gradient(circle, rgba(255,255,255,0.15), transparent); }
+    .feature-emoji { font-size: 2.5rem; margin-bottom: 1.2rem; display: block; }
+    .feature-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem; font-weight: 800;
+      margin-bottom: 0.8rem;
+    }
+    .feature-card p { font-size: 0.95rem; line-height: 1.7; opacity: 0.8; }
+    .feature-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      padding: 0.3rem 0.8rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 1.2rem;
+      letter-spacing: 0.05em;
+    }
+    .card-light .feature-tag { background: rgba(0,0,0,0.08); color: var(--text); }
+
+    /* ─── GALLERY ─── */
+    #gallery {
+      padding: 7rem 0 7rem 5%;
+      background: var(--dark);
+      overflow: hidden;
+    }
+    .gallery-header {
+      padding-right: 5%;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .gallery-header .section-title { color: var(--white); }
+    .gallery-header p { color: rgba(255,255,255,0.5); font-size: 1.05rem; margin-top: 0.5rem; }
+    .gallery-track {
+      display: flex;
+      gap: 1.25rem;
+      overflow-x: auto;
+      padding-bottom: 1.5rem;
+      padding-right: 5%;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .gallery-track::-webkit-scrollbar { display: none; }
+    .gallery-card {
+      min-width: 300px;
+      height: 400px;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      scroll-snap-align: start;
+      flex-shrink: 0;
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+    .gallery-card:hover { transform: scale(1.03); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    .gallery-card-bg {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem;
+      transition: transform 0.5s ease;
+    }
+    .gallery-card:hover .gallery-card-bg { transform: scale(1.06); }
+    .gallery-card-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 2.5rem 1.5rem 1.5rem;
+      background: linear-gradient(transparent, rgba(0,0,0,0.85));
+    }
+    .gallery-card-label h4 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 1.05rem;
+      color: var(--white); margin-bottom: 0.25rem;
+    }
+    .gallery-card-label span {
+      font-size: 0.72rem; font-weight: 600;
+      color: var(--orange);
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .gallery-hint {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; margin-top: 2rem; padding-right: 5%;
+      color: rgba(255,255,255,0.3); font-size: 0.8rem; letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .gallery-hint::before, .gallery-hint::after {
+      content: ''; flex: 1; max-width: 60px;
+      height: 1px; background: rgba(255,255,255,0.15);
+    }
+    @media (max-width: 900px) {
+      .gallery-card { min-width: 260px; height: 340px; }
+    }
+
+    /* ─── PREVIEW ─── */
+    #preview {
+      padding: 7rem 5%;
+      background: var(--dark);
+      color: white;
+    }
+    .preview-header { text-align: center; margin-bottom: 4rem; }
+    .preview-header .section-title { color: white; }
+    .preview-header p { color: rgba(255,255,255,0.5); font-size: 1.05rem; }
+    .preview-frame {
+      max-width: 900px; margin: 0 auto;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.1);
+      position: relative;
+    }
+    .preview-bar {
+      background: #1a1a1a;
+      padding: 0.9rem 1.2rem;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #ff5f56; }
+    .dot-y { background: #ffbd2e; }
+    .dot-g { background: #27c93f; }
+    .preview-url {
+      flex: 1; background: #2a2a2a; border-radius: 6px;
+      padding: 0.35rem 0.8rem; color: rgba(255,255,255,0.4);
+      font-size: 0.8rem; margin-left: 0.5rem;
+    }
+    .preview-screen {
+      height: 520px;
+      position: relative; overflow: hidden;
+    }
+    .preview-screen iframe {
+      width: 100%; height: 100%;
+      border: none; display: block;
+    }
+    .preview-fullscreen-btn {
+      position: absolute; bottom: 1.2rem; right: 1.2rem;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: white;
+      padding: 0.6rem 1.25rem;
+      border-radius: 50px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem; font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 0.5rem;
+      transition: background 0.25s, transform 0.25s, border-color 0.25s;
+      z-index: 10;
+    }
+    .preview-fullscreen-btn:hover {
+      background: var(--orange);
+      border-color: transparent;
+      transform: scale(1.05);
+    }
+    /* Fullscreen state — preview-frame expands to cover viewport */
+    .preview-frame.is-fullscreen {
+      position: fixed !important;
+      inset: 0 !important;
+      max-width: 100vw !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+      z-index: 2000;
+      box-shadow: none !important;
+    }
+    .preview-frame.is-fullscreen .preview-screen {
+      height: calc(100vh - 42px) !important;
+    }
+
+    /* ─── CHATBOT ─── */
+    #chatbot {
+      padding: 7rem 5%;
+      background: var(--gray);
+    }
+    .chatbot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+    .chat-window {
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .chat-header {
+      background: linear-gradient(135deg, var(--dark), #1a1a2e);
+      padding: 1.2rem 1.5rem;
+      display: flex; align-items: center; gap: 0.8rem;
+    }
+    .chat-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--orange), var(--yellow));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+    .chat-header-info h4 { color: white; font-size: 0.95rem; font-weight: 600; }
+    .chat-header-info span { color: rgba(255,255,255,0.5); font-size: 0.75rem; }
+    .online-dot { width: 8px; height: 8px; background: #27c93f; border-radius: 50%; margin-left: auto; box-shadow: 0 0 6px #27c93f; }
+    .chat-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; min-height: 280px; }
+    .msg { max-width: 80%; padding: 0.8rem 1.1rem; border-radius: 16px; font-size: 0.9rem; line-height: 1.5; animation: fadeInUp 0.5s ease both; }
+    .msg-bot { background: var(--gray); border-radius: 4px 16px 16px 16px; }
+    .msg-user { background: linear-gradient(135deg, var(--orange), #ff8c5a); color: white; border-radius: 16px 4px 16px 16px; margin-left: auto; }
+    .msg:nth-child(1){animation-delay:0.3s}
+    .msg:nth-child(2){animation-delay:0.8s}
+    .msg:nth-child(3){animation-delay:1.3s}
+    .msg:nth-child(4){animation-delay:1.8s}
+    .chat-input { padding: 1rem 1.5rem; border-top: 1px solid var(--gray); display: flex; gap: 0.8rem; }
+    .chat-input input {
+      flex: 1; border: 1px solid #eee; border-radius: 50px;
+      padding: 0.65rem 1rem; font-size: 0.9rem; outline: none;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .chat-send {
+      background: var(--orange); color: white; border: none;
+      width: 38px; height: 38px; border-radius: 50%; cursor: pointer;
+      font-size: 1rem; transition: transform 0.2s;
+    }
+    .chat-send:hover { transform: scale(1.1); }
+
+    /* ─── HOW IT WORKS ─── */
+    #how {
+      padding: 7rem 5%;
+      background: white;
+    }
+    .how-header { text-align: center; margin-bottom: 4rem; }
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; position: relative; }
+    .steps::before {
+      content: '';
+      position: absolute; top: 32px; left: 12%; right: 12%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--orange), var(--teal));
+      z-index: 0;
+    }
+    .step { text-align: center; position: relative; z-index: 1; padding: 0 0.5rem; }
+    .step-num {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: white;
+      border: 3px solid var(--orange);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem;
+      color: var(--orange);
+      margin: 0 auto 1.2rem;
+      box-shadow: 0 4px 20px rgba(255,107,43,0.2);
+    }
+    .step:nth-child(2) .step-num { border-color: var(--yellow); color: var(--yellow); box-shadow: 0 4px 20px rgba(255,210,63,0.2); }
+    .step:nth-child(3) .step-num { border-color: var(--teal); color: var(--teal); box-shadow: 0 4px 20px rgba(10,191,188,0.2); }
+    .step:nth-child(4) .step-num { border-color: #a855f7; color: #a855f7; box-shadow: 0 4px 20px rgba(168,85,247,0.2); }
+    .step h4 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 0.5rem; font-size: 1rem; }
+    .step p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+    /* ─── CTA ─── */
+    #cta {
+      padding: 7rem 5%;
+      background: linear-gradient(135deg, var(--dark) 0%, #1a1a2e 50%, #0f3460 100%);
+      text-align: center; position: relative; overflow: hidden;
+    }
+    #cta .circle-1 { opacity: 0.5; }
+    .cta-content { position: relative; z-index: 1; }
+    #cta .section-title { color: white; font-size: clamp(2.2rem, 5vw, 4rem); }
+    #cta p { color: rgba(255,255,255,0.55); font-size: 1.1rem; margin: 1rem auto 2.5rem; max-width: 500px; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #0a0a0a;
+      color: rgba(255,255,255,0.4);
+      padding: 2.5rem 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.85rem;
+    }
+    .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; color: white; font-size: 1.1rem; }
+    .footer-logo span { color: var(--orange); }
+    footer a { color: var(--orange); text-decoration: none; }
+
+    /* ─── MOBILE ─── */
+    @media (max-width: 900px) {
+      .hero-visual { display: none; }
+      .about-grid, .chatbot-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .features-grid { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr 1fr; }
+      .steps::before { display: none; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+    @media (max-width: 500px) {
+      .steps { grid-template-columns: 1fr; }
+      .hero-stats { gap: 1.5rem; }
+    }
+
+    #fab-avatar-mount canvas {
+      transform: scaleY(-1);
+      border-radius: 50%;
+    }
+
+    /* ─── FLOATING CHATBOT ─── */
+    .chat-fab {
+      position: fixed; bottom: 2rem; right: 2rem;
+      width: 68px; height: 68px; border-radius: 50%;
+      background: #0D0D0D;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      z-index: 1500;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      padding: 0;
+      box-shadow:
+        0 0 0 2px rgba(255,107,43,0.8),
+        0 0 20px rgba(255,107,43,0.4),
+        0 8px 30px rgba(0,0,0,0.5);
+      animation: fab-breathe 3s ease-in-out infinite;
+    }
+    .chat-fab:hover {
+      transform: scale(1.08);
+      box-shadow:
+        0 0 0 2px rgba(255,107,43,1),
+        0 0 30px rgba(255,107,43,0.6),
+        0 8px 40px rgba(0,0,0,0.6);
+    }
+    @keyframes fab-breathe {
+      0%, 100% { box-shadow: 0 0 0 2px rgba(255,107,43,0.8), 0 0 20px rgba(255,107,43,0.3), 0 8px 30px rgba(0,0,0,0.5); }
+      50%       { box-shadow: 0 0 0 2px rgba(255,107,43,1),   0 0 35px rgba(255,107,43,0.5), 0 8px 30px rgba(0,0,0,0.5); }
+    }
+    .chat-fab.is-open {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 2px rgba(255,107,43,1), 0 0 40px rgba(255,107,43,0.5), 0 8px 30px rgba(0,0,0,0.6);
+      animation: none;
+    }
+    .chat-fab-ping { display: none; }
+
+    .chat-panel {
+      position: fixed; bottom: 6.5rem; right: 2rem;
+      width: 360px;
+      background: rgba(13,13,20,0.97);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,107,43,0.2);
+      border-radius: 24px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,107,43,0.1);
+      overflow: hidden;
+      z-index: 1499;
+      display: flex; flex-direction: column;
+      transform: translateY(20px) scale(0.95);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
+    }
+    .chat-panel.is-open {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      pointer-events: all;
+    }
+    .chat-panel-header {
+      background: linear-gradient(135deg, var(--dark), #1a1a2e);
+      padding: 1.1rem 1.4rem;
+      display: flex; align-items: center; gap: 0.85rem;
+    }
+    .chat-panel-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--orange), var(--yellow));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .chat-panel-info { flex: 1; }
+    .chat-panel-info h4 { color: var(--white); font-size: 0.95rem; font-weight: 700; font-family: 'Syne', sans-serif; }
+    .chat-panel-info span { color: rgba(255,255,255,0.45); font-size: 0.75rem; }
+    .chat-panel-status {
+      display: flex; align-items: center; gap: 0.4rem;
+      color: #27c93f; font-size: 0.72rem; font-weight: 600;
+    }
+    .chat-panel-status::before {
+      content: ''; width: 7px; height: 7px; border-radius: 50%;
+      background: #27c93f;
+      box-shadow: 0 0 6px #27c93f;
+    }
+    .chat-panel-close {
+      background: rgba(255,255,255,0.1); border: none;
+      color: rgba(255,255,255,0.6); width: 30px; height: 30px;
+      border-radius: 50%; cursor: pointer; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, color 0.2s;
+    }
+    .chat-panel-close:hover { background: rgba(255,255,255,0.2); color: var(--white); }
+
+    .chat-panel-body {
+      padding: 1.2rem; display: flex; flex-direction: column;
+      gap: 0.85rem; height: 260px; overflow-y: auto;
+      background: transparent;
+    }
+    .chat-panel-body::-webkit-scrollbar { width: 4px; }
+    .chat-panel-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+    .cp-msg {
+      max-width: 82%; padding: 0.75rem 1rem;
+      border-radius: 16px; font-size: 0.88rem; line-height: 1.5;
+    }
+    .cp-msg-bot { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.08); color: #e8e6e0; border-radius: 4px 16px 16px 16px; align-self: flex-start; }
+    .cp-msg-user {
+      background: linear-gradient(135deg, var(--orange), #ff8c5a);
+      color: var(--white); border-radius: 16px 4px 16px 16px;
+      align-self: flex-end;
+    }
+    .cp-typing {
+      display: flex; gap: 4px; align-items: center;
+      padding: 0.75rem 1rem; background: var(--gray);
+      border-radius: 4px 16px 16px 16px;
+      width: fit-content; align-self: flex-start;
+    }
+    .cp-typing span {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--muted); display: inline-block;
+      animation: typingDot 1.2s ease-in-out infinite;
+    }
+    .cp-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .cp-typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingDot {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    .chat-panel-footer {
+      padding: 0.85rem 1rem;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      display: flex; gap: 0.6rem; align-items: center;
+    }
+    .chat-panel-input {
+      flex: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 50px;
+      padding: 0.6rem 1rem; font-size: 0.88rem; outline: none;
+      font-family: 'DM Sans', sans-serif;
+      color: #e8e6e0;
+      transition: border-color 0.2s;
+    }
+    .chat-panel-input::placeholder { color: rgba(232,230,224,0.35); }
+    .chat-panel-input:focus { border-color: rgba(255,107,43,0.7); }
+    .chat-panel-send {
+      background: var(--orange); color: var(--white); border: none;
+      width: 38px; height: 38px; border-radius: 50%;
+      cursor: pointer; font-size: 0.95rem; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .chat-panel-send:hover { transform: scale(1.1); box-shadow: 0 4px 16px rgba(255,107,43,0.4); }
+
+    @media (max-width: 500px) {
+      .chat-panel { width: calc(100vw - 2rem); right: 1rem; bottom: 5.5rem; }
+      .chat-fab { bottom: 1.2rem; right: 1.2rem; }
+    }
+
+    /* Mobile menu */
+    .mobile-menu {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(10,10,10,0.97);
+      z-index: 999;
+      flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2rem;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { color: white; font-size: 1.5rem; font-family: 'Syne', sans-serif; font-weight: 700; text-decoration: none; }
+    .mobile-menu a:hover { color: var(--orange); }
+    .close-menu { position: absolute; top: 1.5rem; right: 5%; font-size: 2rem; color: white; cursor: pointer; background: none; border: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="close-menu" id="closeMenu">✕</button>
+    <a href="#about">About</a>
+    <a href="#features">Features</a>
+    <a href="#preview">Tour Preview</a>
+    <a href="#chatbot">Chatbot</a>
+    <a href="#preview" style="color:var(--orange)">🚀 Launch Tour</a>
+  </div>
+
+  <!-- Navbar -->
+  <nav id="navbar">
+    <a href="#" class="nav-logo">Mundi<span>360</span></a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#preview">Tour Preview</a></li>
+      <li><a href="#chatbot">Chatbot</a></li>
+      <li><a href="#preview" class="nav-cta">Launch Tour 🚀</a></li>
+    </ul>
+    <div class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section id="hero">
+    <div class="hero-bg-circles">
+      <div class="circle circle-1"></div>
+      <div class="circle circle-2"></div>
+      <div class="circle circle-3"></div>
+    </div>
+    <div class="grid-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-badge">🎓 Mundiapolis University</div>
+      <h1 class="hero-title">
+        Explore Our Campus<br>in <span class="highlight">360°</span>
+      </h1>
+      <p class="hero-subtitle">
+        A fully immersive virtual tour of Mundiapolis — navigate every building, meet our AI guide, and discover student life from anywhere in the world.
+      </p>
+      <div class="hero-buttons">
+        <a href="#preview" class="btn-primary">🌐 Enter the Tour</a>
+        <a href="#chatbot" class="btn-secondary">🤖 Meet the Chatbot</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-number">8</div>
+          <div class="stat-label">Locations</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">360<span>°</span></div>
+          <div class="stat-label">Full Panorama</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">1<span> AI</span></div>
+          <div class="stat-label">Chatbot</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="tour-preview-circle">
+        <div class="orbit-dot"></div>
+        <div class="orbit-dot"></div>
+        <div class="orbit-dot"></div>
+        <div class="tour-preview-inner">
+          <div class="tour-icon">🏫</div>
+          <p>Mundiapolis</p>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <span>Scroll to explore</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about">
+    <div class="about-grid">
+      <div class="about-text" data-aos="fade-right">
+        <span class="section-tag">About the Project</span>
+        <h2 class="section-title">Bringing Mundiapolis to the World</h2>
+        <p>This project was built to make Mundiapolis accessible to everyone — prospective students, families, and the curious. No need to travel; explore every corner of our campus right from your screen.</p>
+        <p>Powered by <strong>Marzipano</strong> for seamless 360° navigation and an AI chatbot to answer all your questions, this is campus discovery reimagined.</p>
+      </div>
+      <div class="about-cards" data-aos="fade-left" data-aos-delay="100">
+        <div class="about-card">
+          <div class="about-card-icon icon-orange">🗺️</div>
+          <div>
+            <h4>Interactive Navigation</h4>
+            <p>Move freely between locations with smooth transitions and a clickable campus map.</p>
+          </div>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon icon-teal">🤖</div>
+          <div>
+            <h4>AI-Powered Guide</h4>
+            <p>Ask anything about Mundiapolis — programs, facilities, admissions — and get instant answers.</p>
+          </div>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon icon-yellow">📱</div>
+          <div>
+            <h4>Works Everywhere</h4>
+            <p>Fully responsive on desktop, tablet, and mobile. Explore on any device, anytime.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features">
+    <div class="features-header" data-aos="fade-up">
+      <span class="section-tag">What's Inside</span>
+      <h2 class="section-title">Everything You Need to<br>Discover Our Campus</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card card-dark" data-aos="fade-up" data-aos-delay="0">
+        <div class="card-glow"></div>
+        <span class="feature-emoji">🌐</span>
+        <h3>360° Virtual Tour</h3>
+        <p>Built with Marzipano, explore every angle of Mundiapolis with fluid, high-quality panoramic views and hotspot navigation.</p>
+        <span class="feature-tag">Powered by Marzipano</span>
+      </div>
+      <div class="feature-card card-orange" data-aos="fade-up" data-aos-delay="100">
+        <div class="card-glow"></div>
+        <span class="feature-emoji">🤖</span>
+        <h3>Smart AI Chatbot</h3>
+        <p>Your personal campus guide. Ask about programs, schedules, facilities and get helpful answers instantly, 24/7.</p>
+        <span class="feature-tag">Always Available</span>
+      </div>
+      <div class="feature-card card-light" data-aos="fade-up" data-aos-delay="200">
+        <span class="feature-emoji">🗺️</span>
+        <h3>Campus Map</h3>
+        <p>Quickly jump between buildings and locations using our interactive clickable campus map integrated into the tour.</p>
+        <span class="feature-tag">Easy Navigation</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery -->
+  <section id="gallery">
+    <div class="gallery-header" data-aos="fade-up">
+      <span class="section-tag">Campus in Photos</span>
+      <h2 class="section-title">See It Before You Visit</h2>
+      <p>Real places, real atmosphere — a glimpse of life at Mundiapolis</p>
+    </div>
+    <div class="gallery-track" data-aos="fade-up" data-aos-delay="100">
+      <div class="gallery-card">
+        <div class="gallery-card-bg" style="background:linear-gradient(135deg,#1a1a2e,#0f3460)">🏛️</div>
+        <div class="gallery-card-label">
+          <h4>Main Entrance</h4>
+          <span>📍 Location 01</span>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <div class="gallery-card-bg" style="background:linear-gradient(135deg,#1a2e1a,#0f3d1e)">📚</div>
+        <div class="gallery-card-label">
+          <h4>Central Library</h4>
+          <span>📍 Location 02</span>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <div class="gallery-card-bg" style="background:linear-gradient(135deg,#2e1a1a,#3d1a0f)">⚙️</div>
+        <div class="gallery-card-label">
+          <h4>Engineering Faculty</h4>
+          <span>📍 Location 03</span>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <div class="gallery-card-bg" style="background:linear-gradient(135deg,#1a1a2e,#2e1a3d)">💼</div>
+        <div class="gallery-card-label">
+          <h4>Business School</h4>
+          <span>📍 Location 04</span>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <div class="gallery-card-bg" style="background:linear-gradient(135deg,#0a2e2e,#0a3d3a)">🏋️</div>
+        <div class="gallery-card-label">
+          <h4>Sports Complex</h4>
+          <span>📍 Location 05</span>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <div class="gallery-card-bg" style="background:linear-gradient(135deg,#2e2a1a,#3d350f)">☕</div>
+        <div class="gallery-card-label">
+          <h4>Student Lounge</h4>
+          <span>📍 Location 06</span>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <div class="gallery-card-bg" style="background:linear-gradient(135deg,#2e1a2a,#3d0f35)">🎭</div>
+        <div class="gallery-card-label">
+          <h4>Amphitheater</h4>
+          <span>📍 Location 07</span>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <div class="gallery-card-bg" style="background:linear-gradient(135deg,#1a2e1a,#1a3d2a)">🌿</div>
+        <div class="gallery-card-label">
+          <h4>Campus Gardens</h4>
+          <span>📍 Location 08</span>
+        </div>
+      </div>
+    </div>
+    <div class="gallery-hint" data-aos="fade-up" data-aos-delay="200">Scroll to explore all locations</div>
+  </section>
+
+  <!-- Preview -->
+  <section id="preview">
+    <div class="preview-header" data-aos="fade-up">
+      <span class="section-tag" style="color:var(--teal)">Live Preview</span>
+      <h2 class="section-title">Step Inside Mundiapolis</h2>
+      <p>A glimpse of what awaits you in the full 360° experience</p>
+    </div>
+    <div class="preview-frame" data-aos="zoom-in" data-aos-delay="100">
+      <div class="preview-bar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <div class="preview-url">./tour/index.html</div>
+      </div>
+      <div class="preview-screen">
+        <iframe src="./tour/index.html" title="Mundiapolis 360° Virtual Tour" allowfullscreen></iframe>
+        <button class="preview-fullscreen-btn" id="fullscreenBtn" aria-label="Toggle fullscreen">
+          ⛶ Fullscreen
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chatbot -->
+  <section id="chatbot">
+    <div class="chatbot-grid">
+      <div data-aos="fade-right">
+        <span class="section-tag">AI Assistant</span>
+        <h2 class="section-title">Meet Your Campus Guide</h2>
+        <p style="color:var(--muted);line-height:1.8;font-size:1.05rem;margin-bottom:1.5rem">
+          Our built-in chatbot knows everything about Mundiapolis. Ask it anything — from program details to campus facilities — and get instant, helpful answers.
+        </p>
+        <a href="/amira" class="btn-primary" style="display:inline-flex" target="_blank">Try it Now 💬</a>
+      </div>
+      <div data-aos="fade-left" data-aos-delay="100">
+        <div class="chat-window">
+          <div class="chat-header">
+            <div class="chat-avatar">🎓</div>
+            <div class="chat-header-info">
+              <h4>Amira</h4>
+              <span>Your Mundiapolis Guide</span>
+            </div>
+            <div class="online-dot"></div>
+          </div>
+          <div class="chat-body" id="sectionChatBody" style="overflow-y:auto;max-height:280px">
+            <div class="msg msg-bot">👋 Hi! I'm Amira, your Mundiapolis guide. What would you like to know?</div>
+          </div>
+          <div class="chat-input">
+            <input type="text" id="sectionChatInput" placeholder="Ask anything about Mundiapolis..." autocomplete="off" />
+            <button class="chat-send" id="sectionChatSend">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how">
+    <div class="how-header" data-aos="fade-up">
+      <span class="section-tag">How It Works</span>
+      <h2 class="section-title">Explore in 4 Simple Steps</h2>
+    </div>
+    <div class="steps">
+      <div class="step" data-aos="fade-up" data-aos-delay="0">
+        <div class="step-num">01</div>
+        <h4>Land Here</h4>
+        <p>Arrive at this page and get a quick overview of the virtual campus experience.</p>
+      </div>
+      <div class="step" data-aos="fade-up" data-aos-delay="100">
+        <div class="step-num">02</div>
+        <h4>Enter the Tour</h4>
+        <p>Click "Launch Tour" to dive into the fully immersive 360° Marzipano experience.</p>
+      </div>
+      <div class="step" data-aos="fade-up" data-aos-delay="200">
+        <div class="step-num">03</div>
+        <h4>Navigate Freely</h4>
+        <p>Use the campus map or hotspots to move between buildings and discover locations.</p>
+      </div>
+      <div class="step" data-aos="fade-up" data-aos-delay="300">
+        <div class="step-num">04</div>
+        <h4>Ask the AI</h4>
+        <p>Got questions? Chat with Mundi AI anytime during your visit for instant answers.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="cta">
+    <div class="hero-bg-circles">
+      <div class="circle circle-1"></div>
+      <div class="circle circle-2"></div>
+    </div>
+    <div class="cta-content" data-aos="zoom-in">
+      <span class="section-tag" style="color:var(--teal)">Ready?</span>
+      <h2 class="section-title">Start Your Virtual Journey<br>Through <span style="background:linear-gradient(135deg,var(--orange),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Mundiapolis</span></h2>
+      <p>No passport needed. No travel required. Just click and explore.</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="#preview" class="btn-primary" style="font-size:1.1rem;padding:1rem 2.5rem">🌐 Launch the Tour</a>
+        <a href="#chatbot" class="btn-secondary" style="font-size:1.1rem;padding:1rem 2.5rem">🤖 Chat with AI</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-logo">Mundi<span>360</span></div>
+    <span>© 2025 Mundiapolis University — Built with ❤️ by a student</span>
+    <span>Powered by <a href="https://www.marzipano.net" target="_blank">Marzipano</a></span>
+  </footer>
+
+  <!-- Floating Chatbot -->
+  <button class="chat-fab" id="chatFab" aria-label="Open chatbot" style="overflow:hidden;padding:0;border:3px solid #FF6B2B;">
+    <div class="chat-fab-ping"></div>
+    <div id="fab-avatar-mount" style="width:100%;height:100%;border-radius:50%;overflow:hidden;"></div>
+  </button>
+
+  <div class="chat-panel" id="chatPanel" role="dialog" aria-label="Mundi AI chat">
+    <div class="chat-panel-header">
+      <div class="chat-panel-avatar" id="panel-avatar-mount" style="overflow:hidden;padding:0;"></div>
+      <div class="chat-panel-info">
+        <h4>Amira</h4>
+        <div class="chat-panel-status">Online</div>
+      </div>
+      <button class="chat-panel-close" id="chatClose" aria-label="Close chat">✕</button>
+    </div>
+    <div class="chat-panel-body" id="chatBody">
+      <div class="cp-msg cp-msg-bot">👋 Hi! I'm Amira. Ask me anything about Mundiapolis!</div>
+    </div>
+    <div class="chat-panel-footer">
+      <input class="chat-panel-input" id="chatInput" type="text" placeholder="Ask about programs, campus…" autocomplete="off" />
+      <button class="chat-panel-send" id="chatSend" aria-label="Send">➤</button>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    // Init AOS
+    AOS.init({ duration: 700, once: true, offset: 80 });
+
+    // Sticky navbar
+    const nav = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    });
+
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animateCursor() {
+      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(2)'; ring.style.opacity = '0'; });
+      el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; ring.style.opacity = '0.5'; });
+    });
+
+    // Mobile menu
+    document.getElementById('hamburger').addEventListener('click', () => document.getElementById('mobileMenu').classList.add('open'));
+    document.getElementById('closeMenu').addEventListener('click', () => document.getElementById('mobileMenu').classList.remove('open'));
+    document.querySelectorAll('.mobile-menu a').forEach(a => a.addEventListener('click', () => document.getElementById('mobileMenu').classList.remove('open')));
+
+    // Counter animation
+    function animateCounter(el, target) {
+      let count = 0;
+      const step = Math.ceil(target / 40);
+      const timer = setInterval(() => {
+        count = Math.min(count + step, target);
+        el.dataset.val = count;
+        if (count >= target) clearInterval(timer);
+      }, 40);
+    }
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          document.querySelectorAll('.stat-number').forEach(el => {
+            const num = parseInt(el.textContent);
+            if (!isNaN(num)) animateCounter(el, num);
+          });
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.5 });
+    const statsEl = document.querySelector('.hero-stats');
+    if (statsEl) observer.observe(statsEl);
+
+    // Fullscreen tour toggle
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const previewFrame = fullscreenBtn ? fullscreenBtn.closest('.preview-frame') : null;
+    if (fullscreenBtn && previewFrame) {
+      fullscreenBtn.addEventListener('click', () => {
+        const entering = !previewFrame.classList.contains('is-fullscreen');
+        previewFrame.classList.toggle('is-fullscreen', entering);
+        fullscreenBtn.textContent = entering ? '✕ Exit' : '⛶ Fullscreen';
+        document.body.style.overflow = entering ? 'hidden' : '';
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && previewFrame.classList.contains('is-fullscreen')) {
+          previewFrame.classList.remove('is-fullscreen');
+          fullscreenBtn.textContent = '⛶ Fullscreen';
+          document.body.style.overflow = '';
+        }
+      });
+    }
+
+    // Floating chatbot
+    const chatFab   = document.getElementById('chatFab');
+    const chatPanel = document.getElementById('chatPanel');
+    const chatClose = document.getElementById('chatClose');
+    const chatInput = document.getElementById('chatInput');
+    const chatSend  = document.getElementById('chatSend');
+    const chatBody  = document.getElementById('chatBody');
+
+    let cpHistory = [];
+
+    let avatarInitialized = false;
+
+    function toggleChat(open) {
+      const isOpen = open !== undefined ? open : !chatPanel.classList.contains('is-open');
+      chatPanel.classList.toggle('is-open', isOpen);
+      chatFab.classList.toggle('is-open', isOpen);
+      if (isOpen) {
+        chatFab.querySelector('.chat-fab-ping').style.display = 'none';
+        setTimeout(() => chatInput.focus(), 350);
+        // Lazy load avatar on first open only
+        if (!avatarInitialized && typeof initFabAvatar === 'function') {
+          avatarInitialized = true;
+          initFabAvatar();
+        }
+      }
+    }
+
+    function appendMsg(text, type) {
+      const div = document.createElement('div');
+      div.className = 'cp-msg cp-msg-' + type;
+      div.textContent = text;
+      chatBody.appendChild(div);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function showTyping() {
+      const t = document.createElement('div');
+      t.className = 'cp-typing'; t.id = 'cpTyping';
+      t.innerHTML = '<span></span><span></span><span></span>';
+      chatBody.appendChild(t);
+      chatBody.scrollTop = chatBody.scrollHeight;
+      return t;
+    }
+
+    async function sendMessage() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      appendMsg(text, 'user');
+      chatInput.value = '';
+      const typing = showTyping();
+
+      try {
+        const { reply } = await (await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, history: cpHistory })
+        })).json();
+
+        typing.remove();
+        appendMsg(reply, 'bot');
+
+        // Speak via Amira's voice
+        const lang = /[؀-ۿ]/.test(reply) ? 'ar'
+                   : /\b(le|la|je|tu|bonjour|merci|notre|votre)\b/i.test(reply) ? 'fr' : 'en';
+        try {
+          const speakRes = await fetch('/api/speak', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: reply, language: lang })
+          });
+          if (speakRes.ok) {
+            const blob = await speakRes.blob();
+            const audioUrl = URL.createObjectURL(blob);
+            // If avatar is ready, use lip sync; otherwise play raw audio
+            if (window.avatarSpeak) {
+              await window.avatarSpeak(audioUrl, lang);
+              URL.revokeObjectURL(audioUrl);
+            } else {
+              const audio = new Audio(audioUrl);
+              audio.play().catch(() => {});
+              audio.onended = () => URL.revokeObjectURL(audioUrl);
+            }
+          }
+        } catch(e) { console.warn('TTS failed:', e); }
+
+        cpHistory.push({ role: 'user', content: text });
+        cpHistory.push({ role: 'assistant', content: reply });
+        if (cpHistory.length > 20) cpHistory = cpHistory.slice(-20);
+
+      } catch(err) {
+        typing.remove();
+        appendMsg("Sorry, connection issue. Try again!", 'bot');
+        console.error(err);
+      }
+    }
+
+    chatFab.addEventListener('click', () => toggleChat());
+    chatClose.addEventListener('click', () => toggleChat(false));
+    chatSend.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && chatPanel.classList.contains('is-open')) toggleChat(false);
+    });
+
+    // Live section chatbot
+    const secBody  = document.getElementById('sectionChatBody');
+    const secInput = document.getElementById('sectionChatInput');
+    const secBtn   = document.getElementById('sectionChatSend');
+    let secHistory = [];
+
+    function secAppend(text, type) {
+      const d = document.createElement('div');
+      d.className = 'msg ' + (type === 'bot' ? 'msg-bot' : 'msg-user');
+      d.textContent = text;
+      secBody.appendChild(d);
+      secBody.scrollTop = secBody.scrollHeight;
+    }
+
+    async function secSend() {
+      const text = secInput.value.trim();
+      if (!text) return;
+      secAppend(text, 'user');
+      secInput.value = '';
+      secBtn.disabled = true;
+      try {
+        const { reply } = await (await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, history: secHistory })
+        })).json();
+        secAppend(reply, 'bot');
+        secHistory.push({ role:'user', content:text }, { role:'assistant', content:reply });
+        if (secHistory.length > 20) secHistory = secHistory.slice(-20);
+      } catch {
+        secAppend("Connection error. Try again!", 'bot');
+      } finally {
+        secBtn.disabled = false;
+      }
+    }
+
+    document.getElementById('sectionChatSend').addEventListener('click', secSend);
+    document.getElementById('sectionChatInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') secSend();
+    });
+  </script>
+<script type="module">
+import { TalkingHead } from '/talkinghead/modules/talkinghead.mjs';
+
+const AVATAR_URL = '/talkinghead/avatars/avaturn.glb';
+
+let fabHead = null;
+let fabReady = false;
+
+// Init avatar in the FAB button
+window.initFabAvatar = async function initFabAvatar() {
+  const fabBtn = document.getElementById('chatFab');
+  if (fabBtn) fabBtn.style.opacity = '0.6';
+  const mount = document.getElementById('fab-avatar-mount');
+  if (!mount) return;
+  try {
+    fabHead = new TalkingHead(mount, {
+      ttsEndpoint: null,
+      cameraView: 'head',
+      cameraDistance: 0.38,
+      cameraPanY: 0.15,
+      avatarMood: 'neutral',
+      cameraRotateX: 0,
+      cameraRotateY: 0,
+    });
+    await fabHead.showAvatar({
+      url: AVATAR_URL,
+      body: 'M',
+      avatarMood: 'neutral',
+      lipsyncLang: 'fr',
+    });
+    fabReady = true;
+
+    // Also put avatar in panel header
+    const panelMount = document.getElementById('panel-avatar-mount');
+    if (panelMount && panelMount.children.length === 0) {
+      panelMount.style.width = '38px';
+      panelMount.style.height = '38px';
+      panelMount.style.borderRadius = '50%';
+      panelMount.style.overflow = 'hidden';
+      // Share same canvas — clone the canvas into panel header
+      const fabCanvas = mount.querySelector('canvas');
+      if (fabCanvas) {
+        const clone = document.createElement('div');
+        clone.style.cssText = 'width:38px;height:38px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#FF6B2B,#FFD23F);';
+        clone.textContent = 'A';
+        panelMount.appendChild(clone);
+      }
+    }
+
+    if (fabBtn) fabBtn.style.opacity = '1';
+    console.log('FAB avatar ready');
+  } catch(e) {
+    console.warn('FAB avatar failed, showing emoji fallback:', e);
+    if (fabBtn) fabBtn.style.opacity = '1';
+    const mount = document.getElementById('fab-avatar-mount');
+    if (mount) mount.innerHTML = '🎓';
+  }
+}
+
+// Speak with lip sync — called when Amira replies
+window.avatarSpeak = async function(audioUrl, lang = 'fr') {
+  if (!fabReady || !fabHead) return;
+  try {
+    const buf = await (await fetch(audioUrl)).arrayBuffer();
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const decoded = await ctx.decodeAudioData(buf);
+    const fabBtn = document.getElementById('chatFab');
+    if (fabBtn) fabBtn.style.boxShadow = '0 0 0 2px rgba(255,107,43,1), 0 0 50px rgba(255,107,43,0.7), 0 8px 30px rgba(0,0,0,0.5)';
+    await fabHead.speakAudio(
+      { audio: decoded, words: [], wtimes: [], wdurations: [] },
+      { lipsyncLang: lang }
+    );
+    if (fabBtn) fabBtn.style.boxShadow = '';
+  } catch(e) {
+    console.warn('speakAudio failed:', e);
+  }
+};
+
+// Avatar initializes on first chat open — not on page load
+// initFabAvatar is called by toggleChat() below
+</script>
+</body>
+</html>

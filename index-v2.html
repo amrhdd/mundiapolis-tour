@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mundiapolis University — Walk the Campus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..700&family=Spline+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+  :root{
+    --ink:#1c1714;          /* near-black warm */
+    --paper:#f4ede2;        /* warm sand paper */
+    --paper-2:#ece2d3;      /* deeper sand */
+    --terracotta:#c25a32;   /* primary accent */
+    --terracotta-d:#a8451f;
+    --ochre:#d99a4e;        /* secondary accent */
+    --sage:#6b7355;         /* tertiary, muted green */
+    --line:rgba(28,23,20,0.14);
+    --muted:rgba(28,23,20,0.58);
+
+    --serif:'Fraunces',Georgia,serif;
+    --sans:'Spline Sans',system-ui,sans-serif;
+
+    --ease:cubic-bezier(0.16,1,0.3,1);
+  }
+
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-weight:400;
+    line-height:1.6;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* Grain overlay for paper texture */
+  body::before{
+    content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;
+    opacity:0.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  ::selection{background:var(--terracotta);color:var(--paper);}
+
+  /* ─────────── NAV ─────────── */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:1000;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:1.5rem clamp(1.5rem,5vw,4rem);
+    mix-blend-mode:difference;
+  }
+  .logo{
+    font-family:var(--serif);
+    font-weight:600;font-size:1.35rem;letter-spacing:-0.02em;
+    color:var(--paper);text-decoration:none;
+    font-variation-settings:'opsz' 40;
+  }
+  .logo em{font-style:italic;font-weight:300;}
+  .nav-links{display:flex;gap:2.2rem;list-style:none;align-items:center;}
+  .nav-links a{
+    color:var(--paper);text-decoration:none;
+    font-size:0.82rem;font-weight:400;letter-spacing:0.04em;
+    text-transform:uppercase;opacity:0.85;transition:opacity .3s;
+  }
+  .nav-links a:hover{opacity:1;}
+  .nav-toggle{display:none;background:none;border:none;color:var(--paper);cursor:pointer;}
+
+  /* ─────────── HERO ─────────── */
+  #hero{
+    min-height:100vh;position:relative;
+    display:grid;grid-template-columns:1.1fr 0.9fr;
+    background:var(--ink);
+    overflow:hidden;
+  }
+  @media(max-width:900px){#hero{grid-template-columns:1fr;}}
+
+  .hero-left{
+    padding:clamp(6rem,12vh,10rem) clamp(1.5rem,5vw,4rem) 3rem;
+    display:flex;flex-direction:column;justify-content:center;
+    position:relative;z-index:2;
+  }
+  .hero-kicker{
+    display:flex;align-items:center;gap:0.8rem;
+    color:var(--ochre);font-size:0.78rem;letter-spacing:0.18em;
+    text-transform:uppercase;margin-bottom:2rem;
+    opacity:0;animation:rise .9s var(--ease) .1s forwards;
+  }
+  .hero-kicker::before{content:'';width:38px;height:1px;background:var(--ochre);}
+
+  .hero-title{
+    font-family:var(--serif);
+    font-weight:340;
+    font-size:clamp(3rem,7vw,6.5rem);
+    line-height:0.98;letter-spacing:-0.03em;
+    color:var(--paper);
+    font-variation-settings:'opsz' 144;
+    margin-bottom:1.8rem;
+  }
+  .hero-title .l{display:block;overflow:hidden;}
+  .hero-title .l span{display:block;transform:translateY(110%);animation:reveal 1s var(--ease) forwards;}
+  .hero-title .l:nth-child(1) span{animation-delay:.25s;}
+  .hero-title .l:nth-child(2) span{animation-delay:.38s;}
+  .hero-title .l:nth-child(3) span{animation-delay:.51s;}
+  .hero-title em{font-style:italic;font-weight:300;color:var(--ochre);}
+
+  .hero-sub{
+    font-size:1.05rem;color:rgba(244,237,226,0.62);
+    max-width:30rem;font-weight:300;margin-bottom:2.8rem;line-height:1.7;
+    opacity:0;animation:rise .9s var(--ease) .7s forwards;
+  }
+  .hero-actions{
+    display:flex;gap:1rem;flex-wrap:wrap;align-items:center;
+    opacity:0;animation:rise .9s var(--ease) .85s forwards;
+  }
+  .btn{
+    font-family:var(--sans);font-size:0.9rem;font-weight:500;
+    letter-spacing:0.02em;text-decoration:none;cursor:pointer;
+    padding:0.95rem 1.8rem;border-radius:2px;border:1px solid transparent;
+    transition:all .4s var(--ease);display:inline-flex;align-items:center;gap:0.6rem;
+  }
+  .btn-solid{background:var(--terracotta);color:var(--paper);}
+  .btn-solid:hover{background:var(--terracotta-d);transform:translateY(-2px);}
+  .btn-ghost{background:transparent;color:var(--paper);border-color:rgba(244,237,226,0.3);}
+  .btn-ghost:hover{border-color:var(--paper);background:rgba(244,237,226,0.05);}
+  .btn .arr{transition:transform .4s var(--ease);}
+  .btn:hover .arr{transform:translateX(4px);}
+
+  /* Hero right — architectural image plate */
+  .hero-right{position:relative;overflow:hidden;border-left:1px solid rgba(244,237,226,0.08);}
+  .hero-plate{
+    position:absolute;inset:0;
+    background:
+      linear-gradient(135deg, rgba(194,90,50,0.14), transparent 60%),
+      linear-gradient(to bottom, #241d18, #1c1714);
+    display:flex;align-items:center;justify-content:center;
+  }
+  /* "image not yet provided" — but designed to look intentional */
+  .plate-frame{
+    position:absolute;inset:clamp(2rem,5vw,4rem);
+    border:1px solid rgba(217,154,78,0.25);
+    display:flex;align-items:flex-end;padding:2rem;
+    opacity:0;animation:rise 1.2s var(--ease) .6s forwards;
+  }
+  .plate-frame::before{
+    content:'';position:absolute;top:-1px;left:-1px;width:36px;height:36px;
+    border-top:2px solid var(--ochre);border-left:2px solid var(--ochre);
+  }
+  .plate-frame::after{
+    content:'';position:absolute;bottom:-1px;right:-1px;width:36px;height:36px;
+    border-bottom:2px solid var(--ochre);border-right:2px solid var(--ochre);
+  }
+  .plate-label{
+    font-family:var(--serif);font-style:italic;font-size:1rem;
+    color:rgba(244,237,226,0.4);font-weight:300;
+  }
+  .plate-coords{
+    position:absolute;top:2rem;right:2rem;
+    font-size:0.7rem;letter-spacing:0.15em;color:rgba(217,154,78,0.5);
+    text-transform:uppercase;text-align:right;line-height:1.8;
+  }
+  .scroll-cue{
+    position:absolute;bottom:2rem;left:clamp(1.5rem,5vw,4rem);z-index:3;
+    display:flex;align-items:center;gap:0.7rem;
+    color:rgba(244,237,226,0.4);font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;
+    opacity:0;animation:rise 1s var(--ease) 1.1s forwards;
+  }
+  .scroll-cue .dot{width:5px;height:5px;border-radius:50%;background:var(--ochre);animation:pulse 2s infinite;}
+
+  /* ─────────── MARQUEE STRIP ─────────── */
+  .strip{
+    background:var(--terracotta);color:var(--paper);
+    padding:0.9rem 0;overflow:hidden;white-space:nowrap;
+    border-top:1px solid var(--terracotta-d);border-bottom:1px solid var(--terracotta-d);
+  }
+  .strip-track{display:inline-flex;gap:3rem;animation:marquee 28s linear infinite;}
+  .strip-track span{font-family:var(--serif);font-style:italic;font-size:1.05rem;font-weight:300;}
+  .strip-track span::after{content:'✦';margin-left:3rem;font-style:normal;opacity:0.6;}
+
+  /* ─────────── SECTION SHELL ─────────── */
+  section{position:relative;}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 clamp(1.5rem,5vw,4rem);}
+  .eyebrow{
+    display:flex;align-items:center;gap:0.7rem;
+    font-size:0.76rem;letter-spacing:0.16em;text-transform:uppercase;
+    color:var(--terracotta);font-weight:500;margin-bottom:1.2rem;
+  }
+  .eyebrow::before{content:'';width:28px;height:1px;background:var(--terracotta);}
+  .h2{
+    font-family:var(--serif);font-weight:360;
+    font-size:clamp(2.2rem,4.5vw,3.6rem);line-height:1.05;
+    letter-spacing:-0.025em;font-variation-settings:'opsz' 100;
+  }
+  .h2 em{font-style:italic;color:var(--terracotta);font-weight:300;}
+
+  .reveal{opacity:0;transform:translateY(34px);transition:opacity 1s var(--ease),transform 1s var(--ease);}
+  .reveal.in{opacity:1;transform:none;}
+
+  /* ─────────── INTRO / MANIFESTO ─────────── */
+  #intro{padding:clamp(6rem,12vh,9rem) 0;}
+  .intro-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:clamp(2rem,6vw,6rem);align-items:start;}
+  @media(max-width:860px){.intro-grid{grid-template-columns:1fr;gap:2.5rem;}}
+  .intro-lead{
+    font-family:var(--serif);font-weight:340;
+    font-size:clamp(1.5rem,2.6vw,2.1rem);line-height:1.32;letter-spacing:-0.01em;
+  }
+  .intro-lead em{font-style:italic;color:var(--terracotta);}
+  .intro-body p{color:var(--muted);margin-bottom:1.2rem;font-size:1.02rem;max-width:34rem;}
+  .intro-meta{display:flex;gap:2.5rem;margin-top:2.2rem;padding-top:2.2rem;border-top:1px solid var(--line);}
+  .meta-item .n{font-family:var(--serif);font-size:2.4rem;font-weight:400;line-height:1;letter-spacing:-0.02em;}
+  .meta-item .n em{font-style:italic;color:var(--terracotta);}
+  .meta-item .t{font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:0.5rem;}
+
+  /* ─────────── TOUR (the centerpiece) ─────────── */
+  #tour{background:var(--ink);color:var(--paper);padding:clamp(6rem,12vh,9rem) 0;}
+  #tour .eyebrow{color:var(--ochre);}
+  #tour .eyebrow::before{background:var(--ochre);}
+  #tour .h2 em{color:var(--ochre);}
+  .tour-head{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;margin-bottom:2.5rem;flex-wrap:wrap;}
+  .tour-head p{color:rgba(244,237,226,0.55);max-width:24rem;font-weight:300;}
+  .tour-stage{
+    position:relative;border-radius:4px;overflow:hidden;
+    aspect-ratio:16/9;border:1px solid rgba(244,237,226,0.12);
+    background:linear-gradient(135deg,#241d18,#1c1714);
+  }
+  .tour-stage iframe{width:100%;height:100%;border:none;display:block;}
+  /* placeholder shown until tour loads / when no iframe */
+  .tour-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;text-align:center;padding:2rem;}
+  .tour-ph .ring{
+    width:84px;height:84px;border-radius:50%;
+    border:1px solid rgba(217,154,78,0.4);
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .tour-ph .ring::after{
+    content:'';position:absolute;inset:-1px;border-radius:50%;
+    border:1px solid transparent;border-top-color:var(--ochre);
+    animation:spin 3s linear infinite;
+  }
+  .tour-ph .ico{font-size:1.8rem;}
+  .tour-ph p{color:rgba(244,237,226,0.5);font-family:var(--serif);font-style:italic;}
+  .tour-launch{
+    position:absolute;bottom:1.4rem;right:1.4rem;z-index:5;
+    background:rgba(28,23,20,0.7);backdrop-filter:blur(10px);
+    border:1px solid rgba(244,237,226,0.2);color:var(--paper);
+    padding:0.7rem 1.3rem;border-radius:2px;font-family:var(--sans);
+    font-size:0.85rem;font-weight:500;cursor:pointer;
+    display:flex;align-items:center;gap:0.5rem;transition:all .3s var(--ease);
+  }
+  .tour-launch:hover{background:var(--terracotta);border-color:transparent;}
+
+  /* ─────────── GALLERY / PLACES ─────────── */
+  #places{padding:clamp(6rem,12vh,9rem) 0;}
+  .places-head{margin-bottom:3rem;max-width:40rem;}
+  .places-head p{color:var(--muted);margin-top:1rem;}
+  .places-grid{
+    display:grid;grid-template-columns:repeat(12,1fr);gap:1.2rem;
+  }
+  .place{
+    position:relative;border-radius:3px;overflow:hidden;
+    background:var(--paper-2);border:1px solid var(--line);
+    min-height:240px;display:flex;flex-direction:column;justify-content:flex-end;
+    text-decoration:none;color:inherit;cursor:pointer;
+    transition:transform .5s var(--ease),box-shadow .5s var(--ease);
+  }
+  .place:hover{transform:translateY(-4px);box-shadow:0 24px 50px -20px rgba(28,23,20,0.35);}
+  /* varied spans for editorial rhythm */
+  .place.big{grid-column:span 6;min-height:380px;}
+  .place.med{grid-column:span 4;min-height:300px;}
+  .place.sm{grid-column:span 3;}
+  .place.wide{grid-column:span 8;}
+  @media(max-width:860px){
+    .place,.place.big,.place.med,.place.sm,.place.wide{grid-column:span 6;}
+  }
+  @media(max-width:560px){
+    .place,.place.big,.place.med,.place.sm,.place.wide{grid-column:span 12;min-height:260px;}
+  }
+  /* image-ready surface: subtle architectural gradient + number watermark */
+  .place-surface{
+    position:absolute;inset:0;
+    background:linear-gradient(150deg,var(--paper-2),#e3d6c2);
+    overflow:hidden;
+  }
+  .place-surface::after{
+    content:attr(data-n);
+    position:absolute;top:-0.5rem;right:0.5rem;
+    font-family:var(--serif);font-size:7rem;font-weight:300;font-style:italic;
+    color:rgba(28,23,20,0.05);line-height:1;
+  }
+  .place-tag{
+    position:relative;z-index:2;padding:1.4rem;
+    background:linear-gradient(transparent,rgba(28,23,20,0.04));
+  }
+  .place-tag .cat{font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--terracotta);font-weight:600;}
+  .place-tag h4{font-family:var(--serif);font-weight:500;font-size:1.25rem;margin-top:0.3rem;letter-spacing:-0.01em;}
+  .place .go{
+    position:absolute;top:1.2rem;left:1.2rem;z-index:2;
+    width:34px;height:34px;border-radius:50%;border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(244,237,226,0.5);backdrop-filter:blur(4px);
+    opacity:0;transform:scale(0.8);transition:all .4s var(--ease);
+  }
+  .place:hover .go{opacity:1;transform:scale(1);}
+
+  /* ─────────── GUIDE / AMIRA ─────────── */
+  #guide{background:var(--paper-2);padding:clamp(6rem,12vh,9rem) 0;}
+  .guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2.5rem,6vw,5rem);align-items:center;}
+  @media(max-width:860px){.guide-grid{grid-template-columns:1fr;gap:3rem;}}
+  .guide-copy .h2{margin-bottom:1.4rem;}
+  .guide-copy p{color:var(--muted);max-width:30rem;margin-bottom:1rem;font-size:1.02rem;}
+  .guide-feats{list-style:none;margin:2rem 0 2.4rem;}
+  .guide-feats li{display:flex;gap:0.9rem;padding:0.9rem 0;border-bottom:1px solid var(--line);align-items:baseline;}
+  .guide-feats .k{font-family:var(--serif);font-style:italic;color:var(--terracotta);font-size:1.05rem;min-width:2rem;}
+  .guide-feats .v{font-size:0.96rem;}
+
+  .guide-card{
+    background:var(--ink);border-radius:4px;overflow:hidden;
+    box-shadow:0 40px 80px -30px rgba(28,23,20,0.5);
+  }
+  .gc-head{display:flex;align-items:center;gap:0.9rem;padding:1.3rem 1.5rem;border-bottom:1px solid rgba(244,237,226,0.08);}
+  .gc-avatar{
+    width:44px;height:44px;border-radius:50%;flex-shrink:0;
+    background:radial-gradient(circle at 35% 30%,var(--ochre),var(--terracotta));
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--serif);color:var(--paper);font-size:1.1rem;font-style:italic;
+  }
+  .gc-head .nm{color:var(--paper);font-family:var(--serif);font-size:1.05rem;}
+  .gc-head .st{color:var(--sage);font-size:0.74rem;letter-spacing:0.05em;display:flex;align-items:center;gap:0.4rem;margin-top:0.1rem;}
+  .gc-head .st::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--sage);}
+  .gc-body{padding:1.5rem;display:flex;flex-direction:column;gap:0.9rem;min-height:200px;}
+  .bub{padding:0.8rem 1.1rem;border-radius:14px;font-size:0.92rem;max-width:85%;line-height:1.5;}
+  .bub.a{background:rgba(244,237,226,0.07);color:rgba(244,237,226,0.9);border-radius:4px 14px 14px 14px;align-self:flex-start;}
+  .bub.u{background:var(--terracotta);color:var(--paper);border-radius:14px 4px 14px 14px;align-self:flex-end;}
+  .gc-foot{display:flex;gap:0.7rem;padding:1.1rem 1.5rem;border-top:1px solid rgba(244,237,226,0.08);}
+  .gc-foot input{
+    flex:1;background:rgba(244,237,226,0.06);border:1px solid rgba(244,237,226,0.12);
+    border-radius:2px;padding:0.7rem 1rem;color:var(--paper);font-family:var(--sans);
+    font-size:0.9rem;outline:none;transition:border-color .3s;
+  }
+  .gc-foot input::placeholder{color:rgba(244,237,226,0.35);}
+  .gc-foot input:focus{border-color:var(--ochre);}
+  .gc-foot button{
+    background:var(--terracotta);border:none;color:var(--paper);width:42px;border-radius:2px;
+    cursor:pointer;font-size:1rem;transition:background .3s;flex-shrink:0;
+  }
+  .gc-foot button:hover{background:var(--terracotta-d);}
+
+  /* ─────────── PROCESS ─────────── */
+  #process{padding:clamp(6rem,12vh,9rem) 0;}
+  .proc-head{text-align:center;margin-bottom:3.5rem;}
+  .proc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;counter-reset:step;}
+  @media(max-width:860px){.proc-grid{grid-template-columns:1fr 1fr;gap:2rem;}}
+  @media(max-width:520px){.proc-grid{grid-template-columns:1fr;}}
+  .step{padding-top:2rem;border-top:2px solid var(--ink);}
+  .step .num{font-family:var(--serif);font-style:italic;font-size:1rem;color:var(--terracotta);}
+  .step h4{font-family:var(--serif);font-weight:500;font-size:1.3rem;margin:0.6rem 0 0.5rem;letter-spacing:-0.01em;}
+  .step p{font-size:0.92rem;color:var(--muted);}
+
+  /* ─────────── CTA ─────────── */
+  #cta{background:var(--ink);color:var(--paper);padding:clamp(7rem,14vh,11rem) 0;text-align:center;position:relative;overflow:hidden;}
+  #cta::before{
+    content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:120%;height:120%;
+    background:radial-gradient(ellipse at center,rgba(194,90,50,0.12),transparent 55%);
+    pointer-events:none;
+  }
+  .cta-in{position:relative;z-index:2;}
+  #cta .h2{font-size:clamp(2.6rem,6vw,5rem);margin-bottom:1.2rem;}
+  #cta .h2 em{color:var(--ochre);}
+  #cta p{color:rgba(244,237,226,0.55);max-width:32rem;margin:0 auto 2.6rem;font-weight:300;font-size:1.05rem;}
+  .cta-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+
+  /* ─────────── FOOTER ─────────── */
+  footer{background:#16110e;color:rgba(244,237,226,0.5);padding:3.5rem 0 2.5rem;}
+  .foot-grid{display:flex;justify-content:space-between;align-items:flex-start;gap:2rem;flex-wrap:wrap;}
+  .foot-brand{font-family:var(--serif);font-size:1.5rem;color:var(--paper);font-weight:400;}
+  .foot-brand em{font-style:italic;font-weight:300;color:var(--ochre);}
+  .foot-col h5{color:var(--paper);font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1rem;font-weight:500;}
+  .foot-col a{display:block;color:rgba(244,237,226,0.5);text-decoration:none;font-size:0.9rem;margin-bottom:0.6rem;transition:color .3s;}
+  .foot-col a:hover{color:var(--ochre);}
+  .foot-cols{display:flex;gap:3.5rem;flex-wrap:wrap;}
+  .foot-base{margin-top:3rem;padding-top:1.8rem;border-top:1px solid rgba(244,237,226,0.1);display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:0.82rem;}
+
+  /* ─────────── FLOATING CHAT ─────────── */
+  .fab{
+    position:fixed;bottom:1.8rem;right:1.8rem;z-index:1500;
+    width:60px;height:60px;border-radius:50%;cursor:pointer;border:none;
+    background:radial-gradient(circle at 35% 30%,var(--ochre),var(--terracotta));
+    color:var(--paper);font-family:var(--serif);font-style:italic;font-size:1.4rem;
+    box-shadow:0 12px 30px -8px rgba(194,90,50,0.6);
+    transition:transform .35s var(--ease),box-shadow .35s var(--ease);
+  }
+  .fab:hover{transform:scale(1.07);box-shadow:0 16px 40px -8px rgba(194,90,50,0.7);}
+
+  /* ─────────── ANIMATIONS ─────────── */
+  @keyframes reveal{to{transform:translateY(0);}}
+  @keyframes rise{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:none;}}
+  @keyframes marquee{to{transform:translateX(-50%);}}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.25;}}
+
+  @media(max-width:760px){
+    .nav-links{display:none;}
+    .intro-meta{flex-wrap:wrap;gap:1.5rem;}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">Mundiapolis<em>360</em></a>
+  <ul class="nav-links">
+    <li><a href="#intro">The Project</a></li>
+    <li><a href="#tour">The Tour</a></li>
+    <li><a href="#places">Places</a></li>
+    <li><a href="#guide">Amira</a></li>
+    <li><a href="#cta">Begin</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header id="hero">
+  <div class="hero-left">
+    <div class="hero-kicker">Mundiapolis University · Casablanca</div>
+    <h1 class="hero-title">
+      <span class="l"><span>Walk the</span></span>
+      <span class="l"><span>campus before</span></span>
+      <span class="l"><span>you <em>arrive.</em></span></span>
+    </h1>
+    <p class="hero-sub">An immersive 360° tour of Mundiapolis, with a guide who answers every question along the way — in your language, in real time.</p>
+    <div class="hero-actions">
+      <a href="#tour" class="btn btn-solid">Begin the tour <span class="arr">→</span></a>
+      <a href="#guide" class="btn btn-ghost">Meet Amira</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-plate">
+      <div class="plate-coords">33.5731° N<br>7.5898° W<br>—<br>Casablanca, MA</div>
+      <div class="plate-frame">
+        <span class="plate-label">Campus · main view</span>
+      </div>
+    </div>
+    <div class="scroll-cue"><span class="dot"></span> Scroll to enter</div>
+  </div>
+</header>
+
+<!-- STRIP -->
+<div class="strip">
+  <div class="strip-track">
+    <span>Eight locations</span><span>One AI guide</span><span>Three languages</span><span>Zero travel</span>
+    <span>Eight locations</span><span>One AI guide</span><span>Three languages</span><span>Zero travel</span>
+  </div>
+</div>
+
+<!-- INTRO -->
+<section id="intro">
+  <div class="wrap intro-grid">
+    <div class="reveal">
+      <div class="eyebrow">The Project</div>
+      <p class="intro-lead">A campus is more than buildings. It's the <em>feeling</em> of standing in a courtyard, deciding where to go next.</p>
+    </div>
+    <div class="intro-body reveal">
+      <p>Most prospective students judge a university from a brochure or a pin on a map. We wanted something closer to the truth — a way to actually move through Mundiapolis, room by room, from anywhere in the world.</p>
+      <p>So we built one. A 360° tour powered by Marzipano, paired with Amira, an AI guide who knows the campus and answers in English, French, or Arabic — whichever you speak to her in.</p>
+      <div class="intro-meta">
+        <div class="meta-item"><div class="n">8</div><div class="t">Locations</div></div>
+        <div class="meta-item"><div class="n">360<em>°</em></div><div class="t">Panoramic</div></div>
+        <div class="meta-item"><div class="n">3</div><div class="t">Languages</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOUR -->
+<section id="tour">
+  <div class="wrap">
+    <div class="tour-head reveal">
+      <div>
+        <div class="eyebrow">The Experience</div>
+        <h2 class="h2">Step <em>inside</em></h2>
+      </div>
+      <p>Drag to look around. Click the markers to move between spaces. This is the real campus, not a render.</p>
+    </div>
+    <div class="tour-stage reveal">
+      <!-- Replace src with ./tour/index.html once deployed alongside the tour -->
+      <iframe src="./tour/index.html" title="Mundiapolis 360 Tour" allowfullscreen loading="lazy"></iframe>
+      <div class="tour-ph" id="tourPh" style="display:none">
+        <div class="ring"><span class="ico">🧭</span></div>
+        <p>Loading the campus…</p>
+      </div>
+      <button class="tour-launch" id="tourLaunch">⛶ Fullscreen</button>
+    </div>
+  </div>
+</section>
+
+<!-- PLACES -->
+<section id="places">
+  <div class="wrap">
+    <div class="places-head reveal">
+      <div class="eyebrow">Eight Locations</div>
+      <h2 class="h2">Every corner, <em>worth seeing</em></h2>
+      <p>From the main entrance to the gardens — each space is a stop on the tour. Photography is being added; for now, the map of where you'll go.</p>
+    </div>
+    <div class="places-grid">
+      <a class="place big reveal" href="#tour">
+        <div class="place-surface" data-n="01"></div>
+        <div class="go">↗</div>
+        <div class="place-tag"><div class="cat">Arrival</div><h4>Main Entrance</h4></div>
+      </a>
+      <a class="place med reveal" href="#tour">
+        <div class="place-surface" data-n="02"></div>
+        <div class="go">↗</div>
+        <div class="place-tag"><div class="cat">Study</div><h4>Central Library</h4></div>
+      </a>
+      <a class="place sm reveal" href="#tour">
+        <div class="place-surface" data-n="03"></div>
+        <div class="go">↗</div>
+        <div class="place-tag"><div class="cat">Faculty</div><h4>Engineering</h4></div>
+      </a>
+      <a class="place sm reveal" href="#tour">
+        <div class="place-surface" data-n="04"></div>
+        <div class="go">↗</div>
+        <div class="place-tag"><div class="cat">Faculty</div><h4>Business School</h4></div>
+      </a>
+      <a class="place med reveal" href="#tour">
+        <div class="place-surface" data-n="05"></div>
+        <div class="go">↗</div>
+        <div class="place-tag"><div class="cat">Athletics</div><h4>Sports Complex</h4></div>
+      </a>
+      <a class="place sm reveal" href="#tour">
+        <div class="place-surface" data-n="06"></div>
+        <div class="go">↗</div>
+        <div class="place-tag"><div class="cat">Social</div><h4>Student Lounge</h4></div>
+      </a>
+      <a class="place wide reveal" href="#tour">
+        <div class="place-surface" data-n="07"></div>
+        <div class="go">↗</div>
+        <div class="place-tag"><div class="cat">Events</div><h4>The Amphitheater</h4></div>
+      </a>
+      <a class="place med reveal" href="#tour">
+        <div class="place-surface" data-n="08"></div>
+        <div class="go">↗</div>
+        <div class="place-tag"><div class="cat">Open Air</div><h4>Campus Gardens</h4></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- GUIDE -->
+<section id="guide">
+  <div class="wrap guide-grid">
+    <div class="guide-copy reveal">
+      <div class="eyebrow">Your Guide</div>
+      <h2 class="h2">Meet <em>Amira</em></h2>
+      <p>She's not a search bar. Amira talks like a student who actually goes here — ask her about programs, admissions, or what the library's like during exams.</p>
+      <ul class="guide-feats">
+        <li><span class="k">01</span><span class="v">Speaks English, French, and Arabic — replies in whichever you use</span></li>
+        <li><span class="k">02</span><span class="v">Knows the campus, programs, and student life in detail</span></li>
+        <li><span class="k">03</span><span class="v">Talks back — with a real voice, out loud</span></li>
+      </ul>
+      <a href="/amira" class="btn btn-solid" target="_blank">Talk to Amira <span class="arr">→</span></a>
+    </div>
+    <div class="guide-card reveal">
+      <div class="gc-head">
+        <div class="gc-avatar">A</div>
+        <div><div class="nm">Amira</div><div class="st">Online · your guide</div></div>
+      </div>
+      <div class="gc-body" id="gcBody">
+        <div class="bub a">Hi! I'm Amira 👋 Ask me anything about Mundiapolis.</div>
+        <div class="bub u">What programs do you offer?</div>
+        <div class="bub a">We've got Business, Engineering, Law, and Digital Tech — want me to walk you through any of them?</div>
+      </div>
+      <div class="gc-foot">
+        <input id="gcInput" type="text" placeholder="Ask about Mundiapolis…" autocomplete="off" />
+        <button id="gcSend">➤</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="wrap">
+    <div class="proc-head reveal">
+      <div class="eyebrow" style="justify-content:center">How It Works</div>
+      <h2 class="h2">Four steps in</h2>
+    </div>
+    <div class="proc-grid">
+      <div class="step reveal"><div class="num">Step 01</div><h4>Land here</h4><p>You're already in the right place — this page is the front door.</p></div>
+      <div class="step reveal"><div class="num">Step 02</div><h4>Enter the tour</h4><p>Open the 360° viewer and start moving through the campus.</p></div>
+      <div class="step reveal"><div class="num">Step 03</div><h4>Wander</h4><p>Follow the markers between buildings, or jump straight to a place.</p></div>
+      <div class="step reveal"><div class="num">Step 04</div><h4>Ask Amira</h4><p>Curious about something? She's one tap away, the whole time.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="wrap cta-in reveal">
+    <h2 class="h2">Your visit <em>starts now</em></h2>
+    <p>No passport. No flight. No appointment. Just step inside and look around.</p>
+    <div class="cta-actions">
+      <a href="#tour" class="btn btn-solid">Enter the tour <span class="arr">→</span></a>
+      <a href="/amira" class="btn btn-ghost" target="_blank">Ask Amira first</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">Mundiapolis<em>360</em></div>
+        <p style="max-width:18rem;margin-top:0.8rem;font-size:0.9rem;">A virtual tour of Mundiapolis University, Casablanca.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h5>Explore</h5>
+          <a href="#tour">The Tour</a>
+          <a href="#places">Locations</a>
+          <a href="#guide">Amira</a>
+        </div>
+        <div class="foot-col">
+          <h5>University</h5>
+          <a href="https://www.mundiapolis.ma" target="_blank">Official Site</a>
+          <a href="#">Programs</a>
+          <a href="#">Admissions</a>
+        </div>
+        <div class="foot-col">
+          <h5>Visit</h5>
+          <a href="#">Casablanca, Morocco</a>
+          <a href="#">Contact</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>© 2026 Mundiapolis University</span>
+      <span>360° navigation by Marzipano</span>
+    </div>
+  </div>
+</footer>
+
+<!-- FLOATING CHAT -->
+<button class="fab" id="fab" aria-label="Chat with Amira">A</button>
+
+<script>
+  // Scroll reveal
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  },{threshold:0.15});
+  document.querySelectorAll('.reveal').forEach((el,i)=>{
+    el.style.transitionDelay = (i % 4 * 0.07) + 's';
+    io.observe(el);
+  });
+
+  // Fullscreen tour
+  const launch = document.getElementById('tourLaunch');
+  const stage = launch.closest('.tour-stage');
+  launch.addEventListener('click',()=>{
+    if(!document.fullscreenElement){ stage.requestFullscreen?.(); launch.textContent='⛶ Exit'; }
+    else { document.exitFullscreen?.(); launch.textContent='⛶ Fullscreen'; }
+  });
+
+  // Floating chat → opens Amira page (real chatbot lives there)
+  document.getElementById('fab').addEventListener('click',()=>{ window.open('/amira','_blank'); });
+
+  // Embedded guide card → posts to real API (works when served by the chatbot server)
+  const gcInput=document.getElementById('gcInput');
+  const gcSend=document.getElementById('gcSend');
+  const gcBody=document.getElementById('gcBody');
+  let gcHistory=[];
+  function gcAppend(t,who){const d=document.createElement('div');d.className='bub '+(who==='a'?'a':'u');d.textContent=t;gcBody.appendChild(d);gcBody.scrollTop=gcBody.scrollHeight;}
+  async function gcSendMsg(){
+    const t=gcInput.value.trim(); if(!t) return;
+    gcAppend(t,'u'); gcInput.value=''; gcSend.disabled=true;
+    try{
+      const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,history:gcHistory})});
+      const {reply}=await r.json();
+      gcAppend(reply,'a');
+      gcHistory.push({role:'user',content:t},{role:'assistant',content:reply});
+      if(gcHistory.length>20)gcHistory=gcHistory.slice(-20);
+    }catch{ gcAppend("I can't connect right now — try the full chat with the button below.",'a'); }
+    finally{ gcSend.disabled=false; gcInput.focus(); }
+  }
+  gcSend.addEventListener('click',gcSendMsg);
+  gcInput.addEventListener('keydown',e=>{if(e.key==='Enter')gcSendMsg();});
+</script>
+</body>
+</html>

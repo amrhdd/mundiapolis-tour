@@ -14,6 +14,7 @@ export async function initAvatar(container) {
     });
     ready = true;
     container.style.opacity = '1';
+    container.style.background = 'transparent';
     document.getElementById('av-loader')?.remove();
   } catch(e) {
     console.error('Avatar failed:', e);
