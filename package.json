@@ -1,0 +1,38 @@
+{
+  "name": "amira-mundiapolis",
+  "version": "1.0.0",
+  "description": "Amira — a multilingual voice chatbot and virtual guide for Mundiapolis University (Casablanca).",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "scrape": "node scraper.js",
+    "merge": "node merge-knowledge.js",
+    "update-kb": "node scraper.js && node merge-knowledge.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "chatbot",
+    "mundiapolis",
+    "gemini",
+    "groq",
+    "whisper",
+    "tts"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@netlify/functions": "^5.3.0",
+    "axios": "^1.15.2",
+    "cheerio": "^1.2.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.4.0",
+    "groq-sdk": "^1.1.2",
+    "multer": "^2.1.1"
+  }
+}

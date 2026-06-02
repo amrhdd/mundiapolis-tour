@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amira — Your Mundiapolis Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div class="app">
+    <!-- Left side: branding + hero (later this becomes the VR tour) -->
+    <div class="hero">
+      <div class="hero-content">
+        <div class="badge">✨ Virtual Campus Tour</div>
+        <h1>Welcome to <span class="highlight">our Chatbot</span></h1>
+        <p class="subtitle">Meet Amira, your personal guide. Ask her anything about life on campus — programs, admissions, student life. She's here to help.</p>
+        <div class="features">
+          <div class="feature">🎓 Programs &amp; Admissions</div>
+          <div class="feature">🏛️ Campus &amp; Facilities</div>
+          <div class="feature">🌍 Student Life</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right side: chat interface -->
+    <div class="chat-container">
+      <div class="chat-header">
+        <div class="avatar-circle" id="avatar-header-mount">
+          <canvas id="avatar-header-canvas"></canvas>
+        </div>
+        <div class="header-info">
+          <div class="header-name">Amira</div>
+          <div class="header-status"><span class="status-dot"></span> Online</div>
+        </div>
+        <button id="voice-toggle" class="voice-toggle" title="Mute voice">🔊</button>
+      </div>
+
+      <div class="messages" id="messages">
+        <div class="msg bot">
+          <div class="msg-bubble">
+            Hi! I'm Amira 👋 I'm here to help you discover Mundiapolis. What would you like to know?
+          </div>
+        </div>
+      </div>
+
+      <div class="presets" id="presets">
+        <button class="preset-btn">Tell me about Mundiapolis</button>
+        <button class="preset-btn">What programs do you offer?</button>
+        <button class="preset-btn">How do I apply?</button>
+        <button class="preset-btn">Tell me about campus life</button>
+      </div>
+
+      <div class="input-area">
+        <input type="text" id="user-input" placeholder="Ask Amira anything..." autocomplete="off" maxlength="2000">
+        <button id="mic-btn" title="Voice input">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+        </button>
+        <button id="send-btn" title="Send">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="chatbot.js"></script>
+  <script type="module" src="avatar-bridge.js"></script>
+</body>
+</html>

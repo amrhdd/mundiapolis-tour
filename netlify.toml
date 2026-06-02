@@ -1,0 +1,34 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["manual-knowledge.txt", "knowledge-base.txt", "providers.js"]
+
+# Redirect /api/* to the matching function
+[[redirects]]
+  from = "/api/chat"
+  to = "/.netlify/functions/chat"
+  status = 200
+
+[[redirects]]
+  from = "/api/speak"
+  to = "/.netlify/functions/speak"
+  status = 200
+
+[[redirects]]
+  from = "/api/transcribe"
+  to = "/.netlify/functions/transcribe"
+  status = 200
+
+[[redirects]]
+  from = "/api/health"
+  to = "/.netlify/functions/health"
+  status = 200
+
+# Serve amira.html at /amira
+[[redirects]]
+  from = "/amira"
+  to = "/amira.html"
+  status = 200

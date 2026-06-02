@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mundiapolis 360° Tour</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --orange: #FF6B2B;
+      --teal: #0ABFBC;
+      --dark: #0D0D0D;
+      --gray: #F5F5F5;
+      --muted: #666;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #0D0D0D;
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding: 2rem;
+    }
+    h2 { font-size: 1.4rem; font-weight: 700; color: #FF6B2B; }
+    p { color: rgba(255,255,255,0.5); font-size: 0.9rem; line-height: 1.6; max-width: 320px; }
+    .pulse {
+      width: 60px; height: 60px; border-radius: 50%;
+      border: 2px solid #FF6B2B;
+      animation: pulse 2s ease-in-out infinite;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,43,0.4); }
+      50% { box-shadow: 0 0 0 20px rgba(255,107,43,0); }
+    }
+
+    /* ── Floating Chatbot ── */
+    .chat-fab {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--orange), #ff8c5a);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 8px 30px rgba(255,107,43,0.5);
+      z-index: 1500;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .chat-fab:hover { transform: scale(1.1); }
+    .chat-fab.is-open { transform: scale(1.05) rotate(90deg); }
+    .chat-fab-ping {
+      position: absolute; top: -2px; right: -2px;
+      width: 13px; height: 13px; border-radius: 50%;
+      background: var(--teal); border: 2px solid #fff;
+      animation: ping 2s ease-in-out infinite;
+    }
+    @keyframes ping { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.4);opacity:0.6} }
+
+    .chat-panel {
+      position: fixed; bottom: 5.5rem; right: 1.5rem;
+      width: 340px; background: #fff; border-radius: 20px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+      overflow: hidden; z-index: 1499;
+      display: flex; flex-direction: column;
+      transform: translateY(20px) scale(0.95);
+      opacity: 0; pointer-events: none;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s;
+    }
+    .chat-panel.is-open { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+
+    .cp-header {
+      background: linear-gradient(135deg, var(--dark), #1a1a2e);
+      padding: 1rem 1.2rem; display: flex; align-items: center; gap: 0.75rem;
+    }
+    .cp-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--orange), #FFD23F);
+      display: flex; align-items: center; justify-content: center; font-size: 1rem;
+    }
+    .cp-info { flex: 1; }
+    .cp-info h4 { color: #fff; font-size: 0.9rem; font-weight: 700; }
+    .cp-status { color: #27c93f; font-size: 0.7rem; font-weight: 600; }
+    .cp-close {
+      background: rgba(255,255,255,0.1); border: none; color: rgba(255,255,255,0.6);
+      width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+    }
+    .cp-close:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+    .cp-body {
+      padding: 1rem; display: flex; flex-direction: column;
+      gap: 0.75rem; height: 240px; overflow-y: auto;
+      color: #1A1A1A;
+    }
+    .cp-body::-webkit-scrollbar { width: 3px; }
+    .cp-body::-webkit-scrollbar-thumb { background: #eee; border-radius: 3px; }
+
+    .cp-msg { max-width: 82%; padding: 0.65rem 0.9rem; border-radius: 14px; font-size: 0.85rem; line-height: 1.5; }
+    .cp-msg-bot { background: var(--gray); border-radius: 4px 14px 14px 14px; align-self: flex-start; }
+    .cp-msg-user {
+      background: linear-gradient(135deg, var(--orange), #ff8c5a);
+      color: #fff; border-radius: 14px 4px 14px 14px; align-self: flex-end;
+    }
+    .cp-typing {
+      display: flex; gap: 4px; align-items: center;
+      padding: 0.65rem 0.9rem; background: var(--gray);
+      border-radius: 4px 14px 14px 14px; width: fit-content; align-self: flex-start;
+    }
+    .cp-typing span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--muted); animation: typingDot 1.2s ease-in-out infinite;
+    }
+    .cp-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .cp-typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingDot {
+      0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    .cp-footer {
+      padding: 0.75rem 0.9rem; border-top: 1px solid #f0f0f0;
+      display: flex; gap: 0.5rem; align-items: center;
+    }
+    .cp-input {
+      flex: 1; border: 1.5px solid #eee; border-radius: 50px;
+      padding: 0.55rem 0.9rem; font-size: 0.85rem; outline: none;
+      transition: border-color 0.2s; color: #1A1A1A;
+    }
+    .cp-input:focus { border-color: var(--orange); }
+    .cp-send {
+      background: var(--orange); color: #fff; border: none;
+      width: 36px; height: 36px; border-radius: 50%;
+      cursor: pointer; font-size: 0.9rem; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cp-send:hover { transform: scale(1.1); box-shadow: 0 4px 14px rgba(255,107,43,0.4); }
+    .cp-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    @media (max-width: 500px) {
+      .chat-panel { width: calc(100vw - 2rem); right: 1rem; bottom: 5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="placeholder">
+    <div class="pulse">🌐</div>
+    <h2>360° Tour Coming Soon</h2>
+    <p>Drop the Marzipano output folder here at <code>/tour/</code> to activate the immersive virtual campus tour.</p>
+  </div>
+
+  <!-- Floating Chatbot (Amira) -->
+  <button class="chat-fab" id="chatFab" aria-label="Open chatbot">
+    <div class="chat-fab-ping"></div>
+    🤖
+  </button>
+
+  <div class="chat-panel" id="chatPanel" role="dialog" aria-label="Amira — Mundiapolis Guide">
+    <div class="cp-header">
+      <div class="cp-avatar">🤖</div>
+      <div class="cp-info">
+        <h4>Amira</h4>
+        <div class="cp-status">● Online</div>
+      </div>
+      <button class="cp-close" id="chatClose" aria-label="Close">✕</button>
+    </div>
+    <div class="cp-body" id="chatBody">
+      <div class="cp-msg cp-msg-bot">👋 Hi! I'm Amira. Ask me anything about Mundiapolis!</div>
+    </div>
+    <div class="cp-footer">
+      <input class="cp-input" id="chatInput" type="text" placeholder="Ask about programs, campus…" autocomplete="off" />
+      <button class="cp-send" id="chatSend" aria-label="Send">➤</button>
+    </div>
+  </div>
+
+  <script>
+    // Update for production: set to your deployed chatbot server URL
+    const CHATBOT_API = 'http://localhost:3000';
+
+    const chatFab   = document.getElementById('chatFab');
+    const chatPanel = document.getElementById('chatPanel');
+    const chatClose = document.getElementById('chatClose');
+    const chatInput = document.getElementById('chatInput');
+    const chatSend  = document.getElementById('chatSend');
+    const chatBody  = document.getElementById('chatBody');
+    let chatHistory = [];
+
+    function toggleChat(open) {
+      const isOpen = open !== undefined ? open : !chatPanel.classList.contains('is-open');
+      chatPanel.classList.toggle('is-open', isOpen);
+      chatFab.classList.toggle('is-open', isOpen);
+      if (isOpen) {
+        chatFab.querySelector('.chat-fab-ping').style.display = 'none';
+        setTimeout(() => chatInput.focus(), 350);
+      }
+    }
+
+    function appendMsg(text, type) {
+      const div = document.createElement('div');
+      div.className = 'cp-msg cp-msg-' + type;
+      div.textContent = text;
+      chatBody.appendChild(div);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function showTyping() {
+      const t = document.createElement('div');
+      t.className = 'cp-typing'; t.id = 'cpTyping';
+      t.innerHTML = '<span></span><span></span><span></span>';
+      chatBody.appendChild(t);
+      chatBody.scrollTop = chatBody.scrollHeight;
+      return t;
+    }
+
+    async function sendMessage() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      appendMsg(text, 'user');
+      chatInput.value = '';
+      chatSend.disabled = true;
+      const typing = showTyping();
+
+      try {
+        const res = await fetch(`${CHATBOT_API}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, history: chatHistory }),
+        });
+        typing.remove();
+        if (!res.ok) throw new Error('Server error');
+        const data = await res.json();
+        appendMsg(data.reply, 'bot');
+        chatHistory.push({ role: 'user', content: text });
+        chatHistory.push({ role: 'assistant', content: data.reply });
+        if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+      } catch (err) {
+        typing.remove();
+        appendMsg("Oops, I'm having trouble connecting. Try again in a moment?", 'bot');
+      } finally {
+        chatSend.disabled = false;
+        chatInput.focus();
+      }
+    }
+
+    chatFab.addEventListener('click', () => toggleChat());
+    chatClose.addEventListener('click', () => toggleChat(false));
+    chatSend.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && chatPanel.classList.contains('is-open')) toggleChat(false);
+    });
+  </script>
+</body>
+</html>
