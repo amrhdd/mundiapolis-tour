@@ -6,7 +6,6 @@
   node_bundler = "esbuild"
   included_files = ["manual-knowledge.txt", "knowledge-base.txt", "providers.js"]
 
-# Redirect /api/* to the matching function
 [[redirects]]
   from = "/api/chat"
   to = "/.netlify/functions/chat"
@@ -27,7 +26,6 @@
   to = "/.netlify/functions/health"
   status = 200
 
-# Serve amira.html at /amira
 [[redirects]]
   from = "/amira"
   to = "/amira.html"
