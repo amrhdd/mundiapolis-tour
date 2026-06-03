@@ -354,6 +354,23 @@ body::before {
   .chat-card { height:75vh; }
 }
 
+/* ─────────── Back to site link (amira page) ─────────── */
+.amira-back{
+  position:fixed;top:1rem;left:1rem;z-index:9999;
+  display:inline-flex;align-items:center;gap:0.5rem;
+  padding:0.55rem 1rem;
+  background:rgba(0,0,0,0.55);
+  color:#f4ede2;
+  text-decoration:none;
+  font-size:0.9rem;font-weight:500;
+  border-radius:999px;
+  backdrop-filter:blur(6px);
+  border:1px solid rgba(244,237,226,0.2);
+  transition:background 0.2s ease;
+}
+.amira-back:hover{background:rgba(0,0,0,0.75);}
+.amira-back span{font-size:1.1rem;line-height:1;}
+
 /* ─────────── av-widget (floating, for landing page) ─────────── */
 #av-widget{position:fixed;bottom:24px;right:24px;z-index:1000;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
 #av-toggle{width:60px;height:60px;border-radius:50%;border:2px solid rgba(217,154,78,0.5);background:var(--ink);cursor:pointer;font-size:22px;color:var(--ochre);box-shadow:0 0 20px rgba(217,154,78,0.15);transition:transform .2s,box-shadow .2s;animation:av-pulse 2.5s ease-in-out infinite}

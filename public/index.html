@@ -49,10 +49,13 @@
 
   /* ─────────── NAV ─────────── */
   nav{
-    position:fixed;top:0;left:0;right:0;z-index:1000;
+    position:sticky;top:0;z-index:1000;
     display:flex;align-items:center;justify-content:space-between;
-    padding:1.5rem clamp(1.5rem,5vw,4rem);
-    mix-blend-mode:difference;
+    padding:0.9rem clamp(1.5rem,5vw,4rem);
+    background:rgba(18,14,11,0.9);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(244,237,226,0.06);
+    box-shadow:0 1px 20px rgba(0,0,0,0.18);
   }
   .logo{
     font-family:var(--serif);
@@ -60,14 +63,14 @@
     color:var(--paper);text-decoration:none;
     font-variation-settings:'opsz' 40;
   }
-  .logo em{font-style:italic;font-weight:300;}
+  .logo em{font-style:italic;font-weight:300;color:var(--ochre);}
   .nav-links{display:flex;gap:2.2rem;list-style:none;align-items:center;}
   .nav-links a{
-    color:var(--paper);text-decoration:none;
-    font-size:0.82rem;font-weight:400;letter-spacing:0.04em;
-    text-transform:uppercase;opacity:0.85;transition:opacity .3s;
+    color:rgba(244,237,226,0.7);text-decoration:none;
+    font-size:0.82rem;font-weight:500;letter-spacing:0.04em;
+    text-transform:uppercase;transition:color .25s;
   }
-  .nav-links a:hover{opacity:1;}
+  .nav-links a:hover{color:var(--paper);}
   .nav-toggle{display:none;background:none;border:none;color:var(--paper);cursor:pointer;}
 
   /* ─────────── HERO ─────────── */
@@ -130,14 +133,22 @@
   .btn .arr{transition:transform .4s var(--ease);}
   .btn:hover .arr{transform:translateX(4px);}
 
-  /* Hero right — architectural image plate */
+  /* Hero right — live 360 preview panel */
   .hero-right{position:relative;overflow:hidden;border-left:1px solid rgba(244,237,226,0.08);}
+  #hero-pano{position:absolute;inset:0;z-index:1;pointer-events:none;}
+  #hero-pano canvas{pointer-events:none;display:block;width:100%!important;height:100%!important;}
+  /* vignette layered over the pano so the chrome stays readable */
+  .hero-right::after{
+    content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
+    background:
+      linear-gradient(90deg,rgba(26,20,16,0.72) 0%,rgba(26,20,16,0.2) 45%,transparent 100%),
+      radial-gradient(120% 120% at 70% 30%,transparent 55%,rgba(0,0,0,0.45) 100%);
+  }
   .hero-plate{
     position:absolute;inset:0;
-    background:
-      linear-gradient(135deg, rgba(194,90,50,0.14), transparent 60%),
-      linear-gradient(to bottom, #241d18, #1c1714);
+    background:none;
     display:flex;align-items:center;justify-content:center;
+    z-index:3;
   }
   /* "image not yet provided" — but designed to look intentional */
   .plate-frame{
@@ -260,51 +271,96 @@
   .places-grid{
     display:grid;grid-template-columns:repeat(12,1fr);gap:1.2rem;
   }
+  /* ── Place cards ── */
   .place{
-    position:relative;border-radius:3px;overflow:hidden;
+    position:relative;border-radius:6px;overflow:hidden;
     background:var(--paper-2);border:1px solid var(--line);
     min-height:240px;display:flex;flex-direction:column;justify-content:flex-end;
     text-decoration:none;color:inherit;cursor:pointer;
-    transition:transform .5s var(--ease),box-shadow .5s var(--ease);
   }
-  .place:hover{transform:translateY(-4px);box-shadow:0 24px 50px -20px rgba(28,23,20,0.35);}
-  /* varied spans for editorial rhythm */
-  .place.big{grid-column:span 6;min-height:380px;}
-  .place.med{grid-column:span 4;min-height:300px;}
-  .place.sm{grid-column:span 3;}
-  .place.wide{grid-column:span 8;}
+  .place.big{grid-column:span 6;min-height:400px;}
+  .place.med{grid-column:span 4;min-height:320px;}
+  .place.sm{grid-column:span 3;min-height:260px;}
+  .place.wide{grid-column:span 8;min-height:300px;}
   @media(max-width:860px){
-    .place,.place.big,.place.med,.place.sm,.place.wide{grid-column:span 6;}
+    .place,.place.big,.place.med,.place.sm,.place.wide{grid-column:span 6;min-height:260px;}
   }
   @media(max-width:560px){
-    .place,.place.big,.place.med,.place.sm,.place.wide{grid-column:span 12;min-height:260px;}
+    .place,.place.big,.place.med,.place.sm,.place.wide{grid-column:span 12;min-height:240px;}
   }
-  /* image-ready surface: subtle architectural gradient + number watermark */
+
+  /* Surface — the photo layer */
   .place-surface{
     position:absolute;inset:0;
-    background:linear-gradient(150deg,var(--paper-2),#e3d6c2);
-    overflow:hidden;
+    background-size:cover;background-position:center 30%;
+    transition:transform .7s cubic-bezier(0.16,1,0.3,1),opacity .8s ease;
   }
+  /* Slideshow surfaces */
+  .place-surface.slide{opacity:0;}
+  .place-surface.slide.active{opacity:1;}
+
+  /* Subtle zoom on hover */
+  .place:hover .place-surface:not(.slide),
+  .place:hover .place-surface.slide.active{ transform:scale(1.05); }
+
+  /* Number watermark — hidden when photo is loaded */
   .place-surface::after{
     content:attr(data-n);
     position:absolute;top:-0.5rem;right:0.5rem;
     font-family:var(--serif);font-size:7rem;font-weight:300;font-style:italic;
-    color:rgba(28,23,20,0.05);line-height:1;
+    color:rgba(28,23,20,0.06);line-height:1;pointer-events:none;
   }
+
+  /* Photo mapping — 10 cards */
+  .places-grid .place:nth-of-type(1)  .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/entrance.jpg'); }
+  .places-grid .place:nth-of-type(2)  .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/library.jpg'); }
+  .places-grid .place:nth-of-type(3)  .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/engineering.jpg'); }
+  .places-grid .place:nth-of-type(4)  .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/sports-complex.jpg'); }
+  .places-grid .place:nth-of-type(5)  .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/lounge.jpg'); }
+  .places-grid .place:nth-of-type(6)  .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/amphitheater.jpg'); }
+  /* Gardens card: slides have bg set via JS from data-bg */
+  .places-grid .place:nth-of-type(8)  .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/pool.jpg'); }
+  .places-grid .place:nth-of-type(9)  .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/gym.jpg'); }
+  .places-grid .place:nth-of-type(10) .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/mosque.jpg'); }
+
+  /* Place tag — always readable */
   .place-tag{
-    position:relative;z-index:2;padding:1.4rem;
-    background:linear-gradient(transparent,rgba(28,23,20,0.04));
+    position:relative;z-index:3;padding:1.4rem;
+    background:linear-gradient(transparent,rgba(8,6,4,0.5));
   }
-  .place-tag .cat{font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--terracotta);font-weight:600;}
-  .place-tag h4{font-family:var(--serif);font-weight:500;font-size:1.25rem;margin-top:0.3rem;letter-spacing:-0.01em;}
+  .place-tag .cat{
+    font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--ochre) !important;font-weight:600;margin-bottom:0.35rem;
+  }
+  .place-tag h4{
+    font-family:var(--serif);font-weight:500;font-size:1.25rem;
+    letter-spacing:-0.01em;color:#f4ede2 !important;
+    text-shadow:0 1px 12px rgba(0,0,0,0.6);
+  }
+
+  /* Arrow icon */
   .place .go{
-    position:absolute;top:1.2rem;left:1.2rem;z-index:2;
-    width:34px;height:34px;border-radius:50%;border:1px solid var(--line);
+    position:absolute;top:1.2rem;left:1.2rem;z-index:3;
+    width:34px;height:34px;border-radius:50%;
+    border:1px solid rgba(244,237,226,0.3);
     display:flex;align-items:center;justify-content:center;
-    background:rgba(244,237,226,0.5);backdrop-filter:blur(4px);
+    background:rgba(244,237,226,0.12);backdrop-filter:blur(6px);
+    color:#f4ede2;font-size:0.9rem;
     opacity:0;transform:scale(0.8);transition:all .4s var(--ease);
   }
   .place:hover .go{opacity:1;transform:scale(1);}
+
+  /* Slideshow dots */
+  .slide-dots{
+    position:absolute;bottom:1rem;right:1.2rem;z-index:3;
+    display:flex;gap:0.4rem;align-items:center;
+  }
+  .sdot{
+    width:5px;height:5px;border-radius:50%;
+    background:rgba(244,237,226,0.35);
+    transition:background .4s,transform .4s;
+  }
+  .sdot.active{background:var(--ochre);transform:scale(1.3);}
 
   /* ─────────── GUIDE / AMIRA ─────────── */
   #guide{background:var(--paper-2);padding:clamp(6rem,12vh,9rem) 0;}
@@ -444,6 +500,7 @@
     </div>
   </div>
   <div class="hero-right">
+    <div id="hero-pano"></div>
     <div class="hero-plate">
       <div class="plate-coords">33.5731° N<br>7.5898° W<br>—<br>Casablanca, MA</div>
       <div class="plate-frame">
@@ -492,13 +549,20 @@
       <p>Drag to look around. Click the markers to move between spaces. This is the real campus, not a render.</p>
     </div>
     <div class="tour-stage reveal">
-      <!-- Replace src with ./tour/index.html once deployed alongside the tour -->
-      <iframe src="./tour/index.html" title="Mundiapolis 360 Tour" allowfullscreen loading="lazy"></iframe>
-      <div class="tour-ph" id="tourPh" style="display:none">
-        <div class="ring"><span class="ico">🧭</span></div>
-        <p>Loading the campus…</p>
-      </div>
-      <button class="tour-launch" id="tourLaunch">⛶ Fullscreen</button>
+      <!-- MAP — shown first -->
+      <iframe id="map-frame" src="./tour-map.html" title="Carte du campus" loading="lazy"
+              style="width:100%;height:100%;border:none;display:block;"></iframe>
+
+      <!-- TOUR — hidden until a pin is clicked -->
+      <iframe id="tour-frame" title="Visite 360°"
+              style="width:100%;height:100%;border:none;display:none;"
+              allowfullscreen allow="fullscreen" loading="lazy"></iframe>
+
+      <!-- Back to map button — hidden until tour is shown -->
+      <button id="back-to-map" style="display:none;position:absolute;top:1.2rem;left:1.2rem;z-index:50;
+        background:rgba(10,8,6,0.7);backdrop-filter:blur(8px);border:1px solid rgba(244,237,226,0.25);
+        color:#f4ede2;padding:0.6rem 1.1rem;border-radius:3px;font-family:'Spline Sans',sans-serif;
+        font-size:0.85rem;cursor:pointer;transition:all .3s;">← Carte du campus</button>
     </div>
   </div>
 </section>
@@ -512,45 +576,63 @@
       <p>From the main entrance to the gardens — each space is a stop on the tour. Photography is being added; for now, the map of where you'll go.</p>
     </div>
     <div class="places-grid">
-      <a class="place big reveal" href="#tour">
+      <a class="place big reveal" href="#tour" data-scene="34-entree-1">
         <div class="place-surface" data-n="01"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Arrival</div><h4>Main Entrance</h4></div>
       </a>
-      <a class="place med reveal" href="#tour">
+      <a class="place med reveal" href="#tour" data-scene="32-biblio-1">
         <div class="place-surface" data-n="02"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Study</div><h4>Central Library</h4></div>
       </a>
-      <a class="place sm reveal" href="#tour">
+      <a class="place sm reveal" href="#tour" data-scene="0-labo-electronique">
         <div class="place-surface" data-n="03"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Faculty</div><h4>Engineering</h4></div>
       </a>
-      <a class="place sm reveal" href="#tour">
+      <a class="place med reveal" href="#tour" data-scene="41-salle-de-sport-">
         <div class="place-surface" data-n="04"></div>
-        <div class="go">↗</div>
-        <div class="place-tag"><div class="cat">Faculty</div><h4>Business School</h4></div>
-      </a>
-      <a class="place med reveal" href="#tour">
-        <div class="place-surface" data-n="05"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Athletics</div><h4>Sports Complex</h4></div>
       </a>
-      <a class="place sm reveal" href="#tour">
-        <div class="place-surface" data-n="06"></div>
+      <a class="place sm reveal" href="#tour" data-scene="38-buvette-1">
+        <div class="place-surface" data-n="05"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Social</div><h4>Student Lounge</h4></div>
       </a>
-      <a class="place wide reveal" href="#tour">
-        <div class="place-surface" data-n="07"></div>
+      <a class="place wide reveal" href="#tour" data-scene="39-salle-de-conference">
+        <div class="place-surface" data-n="06"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Events</div><h4>The Amphitheater</h4></div>
       </a>
-      <a class="place med reveal" href="#tour">
-        <div class="place-surface" data-n="08"></div>
+      <!-- Gardens card with slideshow — 3 stacked surfaces, JS cycles them -->
+      <a class="place med reveal place-slideshow" href="#tour" data-scene="30-terrain-de-foot" id="gardens-card">
+        <div class="place-surface slide active" data-bg="/assets/photos/gardens-1.jpg"></div>
+        <div class="place-surface slide" data-bg="/assets/photos/gardens-2.jpg"></div>
+        <div class="place-surface slide" data-bg="/assets/photos/gardens-3.jpg"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Open Air</div><h4>Campus Gardens</h4></div>
+        <div class="slide-dots">
+          <span class="sdot active"></span>
+          <span class="sdot"></span>
+          <span class="sdot"></span>
+        </div>
+      </a>
+      <a class="place sm reveal" href="#tour" data-scene="46-salle-de-sport-piscine">
+        <div class="place-surface" data-n="08"></div>
+        <div class="go">↗</div>
+        <div class="place-tag"><div class="cat">Wellness</div><h4>Swimming Pool</h4></div>
+      </a>
+      <a class="place sm reveal" href="#tour" data-scene="43-salle-de-sport-musculation">
+        <div class="place-surface" data-n="09"></div>
+        <div class="go">↗</div>
+        <div class="place-tag"><div class="cat">Fitness</div><h4>Gym</h4></div>
+      </a>
+      <a class="place sm reveal" href="#tour" data-scene="37-mosquee">
+        <div class="place-surface" data-n="10"></div>
+        <div class="go">↗</div>
+        <div class="place-tag"><div class="cat">Spirituality</div><h4>Mosque</h4></div>
       </a>
     </div>
   </div>
@@ -666,13 +748,15 @@
     io.observe(el);
   });
 
-  // Fullscreen tour
+  // Fullscreen tour (guarded — button only present when tour is active)
   const launch = document.getElementById('tourLaunch');
-  const stage = launch.closest('.tour-stage');
-  launch.addEventListener('click',()=>{
-    if(!document.fullscreenElement){ stage.requestFullscreen?.(); launch.textContent='⛶ Exit'; }
-    else { document.exitFullscreen?.(); launch.textContent='⛶ Fullscreen'; }
-  });
+  if(launch){
+    const stage = launch.closest('.tour-stage');
+    launch.addEventListener('click',()=>{
+      if(!document.fullscreenElement){ stage.requestFullscreen?.(); launch.textContent='⛶ Exit'; }
+      else { document.exitFullscreen?.(); launch.textContent='⛶ Fullscreen'; }
+    });
+  }
 
   // Floating chat → opens Amira page (real chatbot lives there)
   document.getElementById('fab').addEventListener('click',()=>{ window.open('/amira','_blank'); });
@@ -703,6 +787,160 @@
   }
   gcSend.addEventListener('click',gcSendMsg);
   gcInput.addEventListener('keydown',e=>{if(e.key==='Enter')gcSendMsg();});
+
+  // Place card → jump to specific tour scene
+  document.querySelectorAll('.place[data-scene]').forEach(function(card){
+    card.addEventListener('click', function(e){
+      e.preventDefault();
+      var sceneId = this.getAttribute('data-scene');
+      if(!sceneId) return;
+
+      var tourSection = document.getElementById('tour');
+      if(tourSection) tourSection.scrollIntoView({behavior:'smooth'});
+
+      var mapFrame = document.getElementById('map-frame');
+      var tourFrame = document.getElementById('tour-frame');
+      var backBtn = document.getElementById('back-to-map');
+
+      if(!tourFrame) return;
+
+      var tourLoaded = tourFrame.src &&
+                       tourFrame.src !== 'about:blank' &&
+                       tourFrame.src !== '' &&
+                       tourFrame.style.display !== 'none';
+
+      if(mapFrame) mapFrame.style.display = 'none';
+      tourFrame.style.display = 'block';
+      if(backBtn) showBackBtn(backBtn);
+
+      if(!tourLoaded){
+        tourFrame.src = './tour/index.html#scene=' + encodeURIComponent(sceneId);
+      } else {
+        try {
+          tourFrame.contentWindow.postMessage({type:'switchScene', sceneId:sceneId}, '*');
+        } catch(err){
+          tourFrame.src = './tour/index.html#scene=' + encodeURIComponent(sceneId);
+        }
+      }
+    });
+  });
+
+  // Receive speak request from tour iframe
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.type === 'amiraSpeak'){
+      var text = e.data.text;
+      var lang = e.data.lang || 'fr';
+      fetch('/api/speak', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({text:text, language:lang})
+      }).then(function(r){ return r.blob(); })
+      .then(function(blob){
+        var url = URL.createObjectURL(blob);
+        var audio = new Audio(url);
+        audio.play().catch(function(){});
+        audio.onended = function(){ URL.revokeObjectURL(url); };
+      }).catch(function(e){ console.warn('Amira speak failed:', e); });
+    }
+  });
+
+  // ── Campus map → tour navigation ──
+  function showBackBtn(btn){
+    btn.style.display = 'block';
+  }
+
+  (function(){
+    var mapFrame = document.getElementById('map-frame');
+    var tourFrame = document.getElementById('tour-frame');
+    var backBtn = document.getElementById('back-to-map');
+
+    window.addEventListener('message', function(e){
+      if(e.data && e.data.type === 'mapPinClick' && e.data.sceneId){
+        var sceneId = e.data.sceneId;
+        tourFrame.src = './tour/index.html#scene=' + encodeURIComponent(sceneId);
+        mapFrame.style.display = 'none';
+        tourFrame.style.display = 'block';
+        showBackBtn(backBtn);
+      }
+    });
+
+    backBtn.addEventListener('click', function(){
+      if(document.fullscreenElement) document.exitFullscreen();
+      var tf = document.getElementById('tour-frame');
+      var mf = document.getElementById('map-frame');
+      if(tf){ tf.style.display = 'none'; tf.src = 'about:blank'; }
+      if(mf) mf.style.display = 'block';
+      this.style.display = 'none';
+    });
+  })();
+
+  // Handle fullscreen request from tour iframe
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.type === 'requestFullscreen'){
+      var stage = document.querySelector('.tour-stage');
+      if(stage && stage.requestFullscreen) stage.requestFullscreen();
+    }
+  });
+
+  // Gardens card slideshow
+  (function(){
+    const card = document.getElementById('gardens-card');
+    if(!card) return;
+    const slides = card.querySelectorAll('.place-surface.slide');
+    const dots = card.querySelectorAll('.sdot');
+    const overlay = 'linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%)';
+
+    // Set backgrounds from data-bg
+    slides.forEach(s => {
+      const bg = s.getAttribute('data-bg');
+      if(bg) s.style.backgroundImage = overlay + ',url(' + bg + ')';
+      s.style.backgroundSize = 'cover';
+      s.style.backgroundPosition = 'center 30%';
+    });
+
+    let cur = 0;
+    function next(){
+      slides[cur].classList.remove('active');
+      dots[cur].classList.remove('active');
+      cur = (cur + 1) % slides.length;
+      slides[cur].classList.add('active');
+      dots[cur].classList.add('active');
+    }
+    setInterval(next, 3500);
+  })();
+
+
+</script>
+<script src="./tour/vendor/marzipano.js"></script>
+<script>
+  // ── Hero 360 live preview — runs after marzipano.js ──
+  (function(){
+    var heroEl = document.getElementById('hero-pano');
+    if(!heroEl || !window.Marzipano) return;
+
+    var viewer = new Marzipano.Viewer(heroEl, { stage: { progressive: true } });
+
+    // Safely disable all interaction — unknown IDs must not crash init.
+    var controls = viewer.controls();
+    ['mouseViewDrag','touchView','pinchZoom','scrollZoom','mouseViewWheel'].forEach(function(id){
+      try { controls.disableMethod(id); } catch(e) { /* not in this build */ }
+    });
+
+    var source   = Marzipano.ImageUrlSource.fromString('/assets/hero-360.jpg');
+    var geometry = new Marzipano.EquirectGeometry([{ width: 4096 }]);
+    var limiter  = Marzipano.RectilinearView.limit.traditional(4096, 100*Math.PI/180);
+    var view     = new Marzipano.RectilinearView({ yaw: 0, pitch: -0.05, fov: 1.2 }, limiter);
+
+    var scene = viewer.createScene({ source: source, geometry: geometry, view: view });
+    scene.switchTo();
+
+    var yaw = 0;
+    (function drift(){
+      yaw += 0.0006;
+      view.setYaw(yaw);
+      requestAnimationFrame(drift);
+    })();
+  })();
 </script>
 </body>
 </html>

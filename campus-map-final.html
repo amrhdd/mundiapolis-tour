@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,300&family=Spline+Sans:wght@400;500;600&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#1c1714;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+  .map-wrap{
+    position:relative;width:100%;max-width:960px;aspect-ratio:960/580;
+    border-radius:6px;overflow:hidden;
+    border:1px solid rgba(217,154,78,0.2);
+    box-shadow:0 40px 80px -20px rgba(0,0,0,0.7);
+  }
+  .map-svg{width:100%;height:100%;display:block;}
+
+  /* SVG-native pins — scale perfectly with the map */
+  .pin-grp{cursor:pointer;}
+  .pin-core{ transition:r .3s cubic-bezier(0.16,1,0.3,1); }
+  .pin-grp:hover .pin-core{ r:9; }
+  .pin-pulse{ transform-origin:center; transform-box:fill-box; }
+  .pin-tip-grp{ opacity:0; transition:opacity .25s; pointer-events:none; }
+  .pin-grp:hover .pin-tip-grp{ opacity:1; }
+
+  @keyframes pulse-ring{
+    0%{ r:6; opacity:0.5; }
+    100%{ r:22; opacity:0; }
+  }
+  .pulse-anim{ animation:pulse-ring 2.6s ease-out infinite; }
+  .pulse-anim2{ animation:pulse-ring 2.6s ease-out infinite; animation-delay:1.3s; }
+
+  .map-header{position:absolute;bottom:1.3rem;left:1.5rem;z-index:30;pointer-events:none;}
+  .map-title{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:1.1rem;color:rgba(244,237,226,0.8);}
+  .map-sub{font-size:0.67rem;letter-spacing:0.13em;text-transform:uppercase;color:rgba(244,237,226,0.3);margin-top:0.2rem;}
+  .legend{position:absolute;bottom:1.2rem;right:1.5rem;z-index:30;display:flex;gap:1.2rem;pointer-events:none;}
+  .li{display:flex;align-items:center;gap:0.4rem;font-size:0.66rem;color:rgba(244,237,226,0.35);letter-spacing:0.06em;font-family:'Spline Sans',sans-serif;}
+  .ld{width:7px;height:7px;border-radius:50%;}
+</style>
+</head>
+<body>
+<div class="map-wrap">
+<svg class="map-svg" viewBox="0 0 960 580" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" style="stop-color:#201c0e"/><stop offset="100%" style="stop-color:#171308"/>
+  </linearGradient>
+  <linearGradient id="bld" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" style="stop-color:#332b15"/><stop offset="100%" style="stop-color:#26200e"/>
+  </linearGradient>
+  <linearGradient id="sport" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" style="stop-color:#172825"/><stop offset="100%" style="stop-color:#0f1c15"/>
+  </linearGradient>
+  <linearGradient id="veg" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" style="stop-color:#283812"/><stop offset="100%" style="stop-color:#1a280a"/>
+  </linearGradient>
+</defs>
+
+<rect width="960" height="580" fill="url(#bg)"/>
+
+<g opacity="0.025" stroke="#d99a4e" stroke-width="0.5">
+  <line x1="0" y1="58" x2="960" y2="58"/><line x1="0" y1="116" x2="960" y2="116"/>
+  <line x1="0" y1="174" x2="960" y2="174"/><line x1="0" y1="232" x2="960" y2="232"/>
+  <line x1="0" y1="290" x2="960" y2="290"/><line x1="0" y1="348" x2="960" y2="348"/>
+  <line x1="0" y1="406" x2="960" y2="406"/><line x1="0" y1="464" x2="960" y2="464"/>
+  <line x1="96" y1="0" x2="96" y2="580"/><line x1="192" y1="0" x2="192" y2="580"/>
+  <line x1="288" y1="0" x2="288" y2="580"/><line x1="384" y1="0" x2="384" y2="580"/>
+  <line x1="480" y1="0" x2="480" y2="580"/><line x1="576" y1="0" x2="576" y2="580"/>
+  <line x1="672" y1="0" x2="672" y2="580"/><line x1="768" y1="0" x2="768" y2="580"/>
+  <line x1="864" y1="0" x2="864" y2="580"/>
+</g>
+
+<rect x="0" y="0" width="960" height="24" fill="url(#veg)" opacity="0.5"/>
+<rect x="0" y="556" width="960" height="24" fill="#181408" opacity="0.95"/>
+
+<!-- ═══ BUILDINGS ═══ -->
+
+<!-- SALLE SPORT -->
+<rect x="40" y="40" width="150" height="145" fill="url(#sport)" rx="2" opacity="0.9"/>
+<rect x="40" y="40" width="150" height="145" fill="none" stroke="rgba(109,181,168,0.28)" stroke-width="1.2" rx="2"/>
+<line x1="40" y1="92" x2="190" y2="92" stroke="rgba(109,181,168,0.08)" stroke-width="1"/>
+<line x1="40" y1="135" x2="190" y2="135" stroke="rgba(109,181,168,0.07)" stroke-width="1"/>
+<text x="115" y="178" text-anchor="middle" fill="rgba(109,181,168,0.35)" font-family="'Spline Sans',sans-serif" font-size="7.5" letter-spacing="1">SALLE SPORT</text>
+
+<!-- SANTÉ -->
+<rect x="202" y="40" width="80" height="145" fill="url(#bld)" rx="2" opacity="0.85"/>
+<rect x="202" y="40" width="80" height="145" fill="none" stroke="rgba(217,154,78,0.18)" stroke-width="1" rx="2"/>
+<text x="242" y="120" text-anchor="middle" fill="rgba(217,154,78,0.28)" font-family="'Spline Sans',sans-serif" font-size="7" letter-spacing="0.8">SANTÉ</text>
+
+<!-- AMPHITHÉÂTRE -->
+<rect x="294" y="40" width="150" height="145" fill="url(#bld)" rx="2" opacity="0.88"/>
+<rect x="294" y="40" width="150" height="145" fill="none" stroke="rgba(194,90,50,0.24)" stroke-width="1.2" rx="2"/>
+<line x1="304" y1="70" x2="434" y2="70" stroke="rgba(194,90,50,0.08)" stroke-width="1"/>
+<line x1="304" y1="90" x2="434" y2="90" stroke="rgba(194,90,50,0.07)" stroke-width="1"/>
+<line x1="304" y1="110" x2="434" y2="110" stroke="rgba(194,90,50,0.07)" stroke-width="1"/>
+<text x="369" y="178" text-anchor="middle" fill="rgba(194,90,50,0.32)" font-family="'Spline Sans',sans-serif" font-size="7.5" letter-spacing="1">AMPHITHÉÂTRE</text>
+
+<!-- MOSQUÉE -->
+<rect x="456" y="40" width="72" height="72" fill="url(#bld)" rx="2" opacity="0.85"/>
+<rect x="456" y="40" width="72" height="72" fill="none" stroke="rgba(217,154,78,0.18)" stroke-width="1" rx="2"/>
+<ellipse cx="492" cy="46" rx="15" ry="7" fill="#2a1f10" stroke="rgba(217,154,78,0.18)" stroke-width="1"/>
+<text x="492" y="135" text-anchor="middle" fill="rgba(217,154,78,0.28)" font-family="'Spline Sans',sans-serif" font-size="6.5" letter-spacing="0.8">MOSQUÉE</text>
+
+<!-- BUVETTE + BIBLIOTHÈQUE -->
+<rect x="540" y="40" width="200" height="145" fill="url(#bld)" rx="2" opacity="0.88"/>
+<rect x="540" y="40" width="200" height="145" fill="none" stroke="rgba(217,154,78,0.22)" stroke-width="1.2" rx="2"/>
+<line x1="680" y1="40" x2="680" y2="185" stroke="rgba(217,154,78,0.25)" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="610" y="120" text-anchor="middle" fill="rgba(194,90,50,0.32)" font-family="'Spline Sans',sans-serif" font-size="7.5" letter-spacing="1">BUVETTE</text>
+<text x="710" y="112" text-anchor="middle" fill="rgba(217,154,78,0.4)" font-family="'Spline Sans',sans-serif" font-size="6" letter-spacing="0.5" transform="rotate(-90,710,112)">BIBLIOTHÈQUE</text>
+
+<!-- INTERNAT — endpoint marker, far left, label centered under flag -->
+<g opacity="0.85">
+  <line x1="40" y1="285" x2="40" y2="340" stroke="rgba(138,175,107,0.5)" stroke-width="2"/>
+  <path d="M40,287 L66,295 L40,303 Z" fill="rgba(138,175,107,0.4)" stroke="rgba(138,175,107,0.6)" stroke-width="1"/>
+  <circle cx="40" cy="340" r="3" fill="rgba(138,175,107,0.6)"/>
+  <text x="40" y="362" text-anchor="middle" fill="rgba(138,175,107,0.5)" font-family="'Fraunces',serif" font-style="italic" font-size="12" letter-spacing="0.5">Internat</text>
+  <text x="40" y="377" text-anchor="middle" fill="rgba(138,175,107,0.32)" font-family="'Spline Sans',sans-serif" font-size="6" letter-spacing="1.5">FIN DU PARCOURS</text>
+</g>
+
+<!-- JARDIN -->
+<ellipse cx="430" cy="300" rx="85" ry="56" fill="#1d2c0f" opacity="0.7"/>
+<ellipse cx="430" cy="300" rx="85" ry="56" fill="none" stroke="rgba(138,175,107,0.18)" stroke-width="1.2"/>
+<ellipse cx="430" cy="300" rx="40" ry="26" fill="#172208" opacity="0.6"/>
+<circle cx="430" cy="300" r="8" fill="rgba(138,175,107,0.1)"/>
+<text x="430" y="374" text-anchor="middle" fill="rgba(138,175,107,0.3)" font-family="'Fraunces',serif" font-style="italic" font-size="9">Jardin</text>
+
+<!-- NORD -->
+<text x="830" y="200" text-anchor="middle" fill="rgba(244,237,226,0.18)" font-family="'Spline Sans',sans-serif" font-size="9" letter-spacing="2">NORD</text>
+<line x1="805" y1="193" x2="855" y2="193" stroke="rgba(244,237,226,0.09)" stroke-width="1"/>
+
+<!-- BÂTIMENT M -->
+<rect x="760" y="225" width="115" height="215" fill="url(#bld)" rx="2" opacity="0.72"/>
+<rect x="760" y="225" width="115" height="215" fill="none" stroke="rgba(217,154,78,0.2)" stroke-width="1" rx="2"/>
+<line x1="760" y1="297" x2="875" y2="297" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+<line x1="760" y1="368" x2="875" y2="368" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+<text x="817" y="335" text-anchor="middle" fill="rgba(217,154,78,0.28)" font-family="'Spline Sans',sans-serif" font-size="8" letter-spacing="1" transform="rotate(-90,817,335)">BÂTIMENT M</text>
+
+<!-- ENTRÉE -->
+<rect x="795" y="462" width="58" height="28" fill="#1e1808" rx="1" opacity="0.95"/>
+<rect x="795" y="462" width="58" height="28" fill="none" stroke="rgba(217,154,78,0.5)" stroke-width="1.5" rx="1"/>
+<rect x="795" y="459" width="6" height="35" fill="rgba(217,154,78,0.25)" rx="1"/>
+<rect x="847" y="459" width="6" height="35" fill="rgba(217,154,78,0.25)" rx="1"/>
+<text x="824" y="508" text-anchor="middle" fill="rgba(217,154,78,0.55)" font-family="'Spline Sans',sans-serif" font-size="6.5" letter-spacing="1.5">ENTRÉE</text>
+
+<!-- TERRAIN FOOT — proper rectangle, 90 degrees -->
+<rect x="40" y="410" width="125" height="105" fill="#1a280e" rx="2" opacity="0.85"/>
+<rect x="40" y="410" width="125" height="105" fill="none" stroke="rgba(138,175,107,0.22)" stroke-width="1.2" rx="2"/>
+<line x1="102" y1="410" x2="102" y2="515" stroke="rgba(138,175,107,0.12)" stroke-width="1"/>
+<circle cx="102" cy="462" r="14" fill="none" stroke="rgba(138,175,107,0.1)" stroke-width="1"/>
+<rect x="40" y="445" width="22" height="35" fill="none" stroke="rgba(138,175,107,0.08)" stroke-width="1"/>
+<rect x="143" y="445" width="22" height="35" fill="none" stroke="rgba(138,175,107,0.08)" stroke-width="1"/>
+<text x="102" y="533" text-anchor="middle" fill="rgba(138,175,107,0.28)" font-family="'Spline Sans',sans-serif" font-size="6.5" letter-spacing="0.8">TERRAIN FOOT</text>
+
+<!-- INFIRMERIE — moved closer to terrain, larger -->
+<rect x="185" y="415" width="100" height="95" fill="url(#bld)" rx="2" opacity="0.8"/>
+<rect x="185" y="415" width="100" height="95" fill="none" stroke="rgba(217,154,78,0.17)" stroke-width="1" rx="2"/>
+<text x="235" y="528" text-anchor="middle" fill="rgba(217,154,78,0.26)" font-family="'Spline Sans',sans-serif" font-size="6.5" letter-spacing="0.6">INFIRMERIE</text>
+
+<!-- BÂTIMENT G -->
+<rect x="305" y="420" width="380" height="95" fill="url(#bld)" rx="2" opacity="0.75"/>
+<rect x="305" y="420" width="380" height="95" fill="none" stroke="rgba(217,154,78,0.22)" stroke-width="1.2" rx="2"/>
+<line x1="305" y1="468" x2="685" y2="468" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+<text x="495" y="455" text-anchor="middle" fill="rgba(217,154,78,0.3)" font-family="'Spline Sans',sans-serif" font-size="8.5" letter-spacing="1.5">BÂTIMENT GÉNIE</text>
+<text x="495" y="490" text-anchor="middle" fill="rgba(217,154,78,0.18)" font-family="'Spline Sans',sans-serif" font-size="6" letter-spacing="1">LABORATOIRES</text>
+
+<!-- ═══ PINS as native SVG (scale perfectly) ═══ -->
+<!-- Each pin: pulse circles + core + tooltip. data-scene on group. -->
+
+<!-- SALLE SPORT (115,112) teal -->
+<g class="pin-grp" data-scene="41-salle-de-sport-">
+  <circle class="pulse-anim" cx="115" cy="112" r="6" fill="#6db5a8"/>
+  <circle class="pulse-anim2" cx="115" cy="112" r="6" fill="#6db5a8"/>
+  <circle class="pin-core" cx="115" cy="112" r="6" fill="#6db5a8" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+  <g class="pin-tip-grp"><rect x="68" y="84" width="94" height="20" rx="2" fill="rgba(8,6,4,0.92)" stroke="rgba(217,154,78,0.35)"/><text x="115" y="98" text-anchor="middle" fill="#f4ede2" font-family="'Spline Sans',sans-serif" font-size="9">Complexe Sportif</text></g>
+</g>
+
+<!-- SANTÉ (242,112) teal -->
+<g class="pin-grp" data-scene="43-salle-de-sport-musculation">
+  <circle class="pulse-anim" cx="242" cy="112" r="6" fill="#6db5a8"/>
+  <circle class="pin-core" cx="242" cy="112" r="6" fill="#6db5a8" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+  <g class="pin-tip-grp"><rect x="198" y="84" width="88" height="20" rx="2" fill="rgba(8,6,4,0.92)" stroke="rgba(217,154,78,0.35)"/><text x="242" y="98" text-anchor="middle" fill="#f4ede2" font-family="'Spline Sans',sans-serif" font-size="9">Salle Musculation</text></g>
+</g>
+
+<!-- AMPHITHÉÂTRE (369,112) terracotta -->
+<g class="pin-grp" data-scene="39-salle-de-conference">
+  <circle class="pulse-anim" cx="369" cy="112" r="6" fill="#c25a32"/>
+  <circle class="pulse-anim2" cx="369" cy="112" r="6" fill="#c25a32"/>
+  <circle class="pin-core" cx="369" cy="112" r="6" fill="#c25a32" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+  <g class="pin-tip-grp"><rect x="333" y="84" width="72" height="20" rx="2" fill="rgba(8,6,4,0.92)" stroke="rgba(217,154,78,0.35)"/><text x="369" y="98" text-anchor="middle" fill="#f4ede2" font-family="'Spline Sans',sans-serif" font-size="9">Amphithéâtre</text></g>
+</g>
+
+<!-- MOSQUÉE (492,76) terracotta -->
+<g class="pin-grp" data-scene="37-mosquee">
+  <circle class="pulse-anim" cx="492" cy="76" r="6" fill="#c25a32"/>
+  <circle class="pin-core" cx="492" cy="76" r="6" fill="#c25a32" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+  <g class="pin-tip-grp"><rect x="464" y="48" width="56" height="20" rx="2" fill="rgba(8,6,4,0.92)" stroke="rgba(217,154,78,0.35)"/><text x="492" y="62" text-anchor="middle" fill="#f4ede2" font-family="'Spline Sans',sans-serif" font-size="9">Mosquée</text></g>
+</g>
+
+<!-- BUVETTE (610,112) terracotta -->
+<g class="pin-grp" data-scene="38-buvette-1">
+  <circle class="pulse-anim" cx="610" cy="112" r="6" fill="#c25a32"/>
+  <circle class="pulse-anim2" cx="610" cy="112" r="6" fill="#c25a32"/>
+  <circle class="pin-core" cx="610" cy="112" r="6" fill="#c25a32" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+  <g class="pin-tip-grp"><rect x="578" y="84" width="64" height="20" rx="2" fill="rgba(8,6,4,0.92)" stroke="rgba(217,154,78,0.35)"/><text x="610" y="98" text-anchor="middle" fill="#f4ede2" font-family="'Spline Sans',sans-serif" font-size="9">Buvette</text></g>
+</g>
+
+<!-- BIBLIOTHÈQUE (710,112) ochre -->
+<g class="pin-grp" data-scene="32-biblio-1">
+  <circle class="pulse-anim" cx="710" cy="112" r="6" fill="#d99a4e"/>
+  <circle class="pin-core" cx="710" cy="112" r="6" fill="#d99a4e" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+  <g class="pin-tip-grp"><rect x="672" y="84" width="76" height="20" rx="2" fill="rgba(8,6,4,0.92)" stroke="rgba(217,154,78,0.35)"/><text x="710" y="98" text-anchor="middle" fill="#f4ede2" font-family="'Spline Sans',sans-serif" font-size="9">Bibliothèque</text></g>
+</g>
+
+<!-- JARDIN (430,300) green -->
+<g class="pin-grp" data-scene="30-terrain-de-foot">
+  <circle class="pulse-anim" cx="430" cy="300" r="6" fill="#8aaf6b"/>
+  <circle class="pulse-anim2" cx="430" cy="300" r="6" fill="#8aaf6b"/>
+  <circle class="pin-core" cx="430" cy="300" r="6" fill="#8aaf6b" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+  <g class="pin-tip-grp"><rect x="386" y="272" width="88" height="20" rx="2" fill="rgba(8,6,4,0.92)" stroke="rgba(217,154,78,0.35)"/><text x="430" y="286" text-anchor="middle" fill="#f4ede2" font-family="'Spline Sans',sans-serif" font-size="9">Jardins du Campus</text></g>
+</g>
+
+<!-- BÂTIMENT M (817,332) ochre -->
+<g class="pin-grp" data-scene="18-bm-rdc2">
+  <circle class="pulse-anim" cx="817" cy="332" r="6" fill="#d99a4e"/>
+  <circle class="pulse-anim2" cx="817" cy="332" r="6" fill="#d99a4e"/>
+  <circle class="pin-core" cx="817" cy="332" r="6" fill="#d99a4e" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+  <g class="pin-tip-grp"><rect x="765" y="304" width="104" height="20" rx="2" fill="rgba(8,6,4,0.92)" stroke="rgba(217,154,78,0.35)"/><text x="817" y="318" text-anchor="middle" fill="#f4ede2" font-family="'Spline Sans',sans-serif" font-size="9">Bâtiment Management</text></g>
+</g>
+
+<!-- ENTRÉE (824,476) ochre — start -->
+<g class="pin-grp" data-scene="34-entree-1">
+  <circle class="pulse-anim" cx="824" cy="476" r="6" fill="#d99a4e"/>
+  <circle class="pulse-anim2" cx="824" cy="476" r="6" fill="#d99a4e"/>
+  <circle class="pin-core" cx="824" cy="476" r="7" fill="#d99a4e" stroke="rgba(255,255,255,0.55)" stroke-width="2"/>
+  <g class="pin-tip-grp"><rect x="778" y="448" width="92" height="20" rx="2" fill="rgba(8,6,4,0.92)" stroke="rgba(217,154,78,0.5)"/><text x="824" y="462" text-anchor="middle" fill="#f4ede2" font-family="'Spline Sans',sans-serif" font-size="9">Entrée ★ Départ</text></g>
+</g>
+
+<!-- TERRAIN FOOT (102,462) green -->
+<g class="pin-grp" data-scene="30-terrain-de-foot">
+  <circle class="pulse-anim" cx="102" cy="462" r="6" fill="#8aaf6b"/>
+  <circle class="pin-core" cx="102" cy="462" r="6" fill="#8aaf6b" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+  <g class="pin-tip-grp"><rect x="56" y="434" width="92" height="20" rx="2" fill="rgba(8,6,4,0.92)" stroke="rgba(217,154,78,0.35)"/><text x="102" y="448" text-anchor="middle" fill="#f4ede2" font-family="'Spline Sans',sans-serif" font-size="9">Terrain de Football</text></g>
+</g>
+
+<!-- INFIRMERIE (235,462) ochre -->
+<g class="pin-grp" data-scene="12-administration">
+  <circle class="pulse-anim" cx="235" cy="462" r="6" fill="#d99a4e"/>
+  <circle class="pin-core" cx="235" cy="462" r="6" fill="#d99a4e" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+  <g class="pin-tip-grp"><rect x="199" y="434" width="72" height="20" rx="2" fill="rgba(8,6,4,0.92)" stroke="rgba(217,154,78,0.35)"/><text x="235" y="448" text-anchor="middle" fill="#f4ede2" font-family="'Spline Sans',sans-serif" font-size="9">Infirmerie</text></g>
+</g>
+
+<!-- BÂTIMENT G (495,468) ochre -->
+<g class="pin-grp" data-scene="13-bg-rdc1">
+  <circle class="pulse-anim" cx="495" cy="468" r="6" fill="#d99a4e"/>
+  <circle class="pulse-anim2" cx="495" cy="468" r="6" fill="#d99a4e"/>
+  <circle class="pin-core" cx="495" cy="468" r="6" fill="#d99a4e" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+  <g class="pin-tip-grp"><rect x="451" y="440" width="88" height="20" rx="2" fill="rgba(8,6,4,0.92)" stroke="rgba(217,154,78,0.35)"/><text x="495" y="454" text-anchor="middle" fill="#f4ede2" font-family="'Spline Sans',sans-serif" font-size="9">Bâtiment Génie</text></g>
+</g>
+
+</svg>
+
+<div class="map-header">
+  <div class="map-title">Campus Mundiapolis · Casablanca</div>
+  <div class="map-sub">Sélectionnez un lieu · 49 scènes</div>
+</div>
+<div class="legend">
+  <div class="li"><div class="ld" style="background:#d99a4e"></div>Académique</div>
+  <div class="li"><div class="ld" style="background:#c25a32"></div>Social</div>
+  <div class="li"><div class="ld" style="background:#6db5a8"></div>Sports</div>
+  <div class="li"><div class="ld" style="background:#8aaf6b"></div>Extérieur</div>
+</div>
+</div>
+
+<script>
+document.querySelectorAll('.pin-grp').forEach(function(g){
+  g.addEventListener('click', function(){
+    console.log('Navigate to scene:', this.getAttribute('data-scene'));
+  });
+});
+</script>
+</body>
+</html>

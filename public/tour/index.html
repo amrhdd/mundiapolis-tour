@@ -1,264 +1,477 @@
-<!DOCTYPE html>
-<html lang="en">
+﻿<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mundiapolis 360° Tour</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --orange: #FF6B2B;
-      --teal: #0ABFBC;
-      --dark: #0D0D0D;
-      --gray: #F5F5F5;
-      --muted: #666;
-    }
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: #0D0D0D;
-      color: #fff;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
-    .placeholder {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-      padding: 2rem;
-    }
-    h2 { font-size: 1.4rem; font-weight: 700; color: #FF6B2B; }
-    p { color: rgba(255,255,255,0.5); font-size: 0.9rem; line-height: 1.6; max-width: 320px; }
-    .pulse {
-      width: 60px; height: 60px; border-radius: 50%;
-      border: 2px solid #FF6B2B;
-      animation: pulse 2s ease-in-out infinite;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.8rem;
-    }
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,43,0.4); }
-      50% { box-shadow: 0 0 0 20px rgba(255,107,43,0); }
-    }
+<title>mundiapolis campus tour</title>
+<meta charset="utf-8">
+<meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+<style> @-ms-viewport { width: device-width; } </style>
+<link rel="stylesheet" href="vendor/reset.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+/* ── Mundiapolis 360 — Custom Tour UI ── */
 
-    /* ── Floating Chatbot ── */
-    .chat-fab {
-      position: fixed; bottom: 1.5rem; right: 1.5rem;
-      width: 56px; height: 56px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--orange), #ff8c5a);
-      border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem;
-      box-shadow: 0 8px 30px rgba(255,107,43,0.5);
-      z-index: 1500;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .chat-fab:hover { transform: scale(1.1); }
-    .chat-fab.is-open { transform: scale(1.05) rotate(90deg); }
-    .chat-fab-ping {
-      position: absolute; top: -2px; right: -2px;
-      width: 13px; height: 13px; border-radius: 50%;
-      background: var(--teal); border: 2px solid #fff;
-      animation: ping 2s ease-in-out infinite;
-    }
-    @keyframes ping { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.4);opacity:0.6} }
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300&family=Spline+Sans:wght@400;500&display=swap');
 
-    .chat-panel {
-      position: fixed; bottom: 5.5rem; right: 1.5rem;
-      width: 340px; background: #fff; border-radius: 20px;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.25);
-      overflow: hidden; z-index: 1499;
-      display: flex; flex-direction: column;
-      transform: translateY(20px) scale(0.95);
-      opacity: 0; pointer-events: none;
-      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s;
-    }
-    .chat-panel.is-open { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+:root{
+  --terracotta:#c25a32;
+  --ochre:#d99a4e;
+}
 
-    .cp-header {
-      background: linear-gradient(135deg, var(--dark), #1a1a2e);
-      padding: 1rem 1.2rem; display: flex; align-items: center; gap: 0.75rem;
-    }
-    .cp-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--orange), #FFD23F);
-      display: flex; align-items: center; justify-content: center; font-size: 1rem;
-    }
-    .cp-info { flex: 1; }
-    .cp-info h4 { color: #fff; font-size: 0.9rem; font-weight: 700; }
-    .cp-status { color: #27c93f; font-size: 0.7rem; font-weight: 600; }
-    .cp-close {
-      background: rgba(255,255,255,0.1); border: none; color: rgba(255,255,255,0.6);
-      width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: center; transition: background 0.2s;
-    }
-    .cp-close:hover { background: rgba(255,255,255,0.2); color: #fff; }
+/* Body — no margin, pure immersion */
+body { margin:0; padding:0; overflow:hidden; background:#000; }
 
-    .cp-body {
-      padding: 1rem; display: flex; flex-direction: column;
-      gap: 0.75rem; height: 240px; overflow-y: auto;
-      color: #1A1A1A;
-    }
-    .cp-body::-webkit-scrollbar { width: 3px; }
-    .cp-body::-webkit-scrollbar-thumb { background: #eee; border-radius: 3px; }
+/* Pano container fills everything */
+#pano { position:absolute; inset:0; }
 
-    .cp-msg { max-width: 82%; padding: 0.65rem 0.9rem; border-radius: 14px; font-size: 0.85rem; line-height: 1.5; }
-    .cp-msg-bot { background: var(--gray); border-radius: 4px 14px 14px 14px; align-self: flex-start; }
-    .cp-msg-user {
-      background: linear-gradient(135deg, var(--orange), #ff8c5a);
-      color: #fff; border-radius: 14px 4px 14px 14px; align-self: flex-end;
-    }
-    .cp-typing {
-      display: flex; gap: 4px; align-items: center;
-      padding: 0.65rem 0.9rem; background: var(--gray);
-      border-radius: 4px 14px 14px 14px; width: fit-content; align-self: flex-start;
-    }
-    .cp-typing span {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--muted); animation: typingDot 1.2s ease-in-out infinite;
-    }
-    .cp-typing span:nth-child(2) { animation-delay: 0.2s; }
-    .cp-typing span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes typingDot {
-      0%,60%,100% { transform: translateY(0); opacity: 0.4; }
-      30% { transform: translateY(-5px); opacity: 1; }
-    }
+/* Hide Marzipano's default title bar and any duplicate */
+#titleBar { display:none !important; }
+#title-bar-default { display:none !important; }
+#sceneNameElement { display:none !important; }
+.sceneName { display:none !important; }
 
-    .cp-footer {
-      padding: 0.75rem 0.9rem; border-top: 1px solid #f0f0f0;
-      display: flex; gap: 0.5rem; align-items: center;
-    }
-    .cp-input {
-      flex: 1; border: 1.5px solid #eee; border-radius: 50px;
-      padding: 0.55rem 0.9rem; font-size: 0.85rem; outline: none;
-      transition: border-color 0.2s; color: #1A1A1A;
-    }
-    .cp-input:focus { border-color: var(--orange); }
-    .cp-send {
-      background: var(--orange); color: #fff; border: none;
-      width: 36px; height: 36px; border-radius: 50%;
-      cursor: pointer; font-size: 0.9rem; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .cp-send:hover { transform: scale(1.1); box-shadow: 0 4px 14px rgba(255,107,43,0.4); }
-    .cp-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+/* Hide ugly default controls */
+#controls, .controls { display:none !important; }
+.viewControlButton { display:none !important; }
+#autorotateToggle { display:none !important; }
 
-    @media (max-width: 500px) {
-      .chat-panel { width: calc(100vw - 2rem); right: 1rem; bottom: 5rem; }
-    }
-  </style>
+/* Our custom title bar — bottom, minimal */
+#title-bar {
+  position:absolute;
+  bottom:0;left:0;right:0;
+  z-index:100;
+  padding:3rem 2rem 1.5rem;
+  background:linear-gradient(transparent,rgba(6,4,3,0.7));
+  pointer-events:none;
+  display:flex;align-items:flex-end;justify-content:space-between;
+}
+#scene-name-display {
+  font-family:'Fraunces',Georgia,serif;
+  font-style:italic;font-weight:300;
+  font-size:clamp(1.2rem,2.5vw,1.8rem);
+  color:rgba(244,237,226,0.95);
+  letter-spacing:0.02em;
+  text-shadow:0 1px 12px rgba(0,0,0,0.6);
+}
+#scene-counter {
+  position:absolute;
+  bottom:1.25rem;left:50%;transform:translateX(-50%);
+  font-family:'Spline Sans',system-ui,sans-serif;
+  font-size:0.75rem;font-weight:500;
+  color:rgba(244,237,226,0.85);
+  letter-spacing:0.08em;text-transform:uppercase;
+  pointer-events:none;
+  background:rgba(26,20,16,0.45);
+  padding:0.3rem 0.8rem;border-radius:999px;
+  backdrop-filter:blur(4px);
+  white-space:nowrap;
+}
+
+/* Scenes panel — dark minimal */
+#scenes-list, .scene-list, #sceneList {
+  background:rgba(10,8,6,0.94) !important;
+  backdrop-filter:blur(16px) !important;
+  border-right:1px solid rgba(244,237,226,0.07) !important;
+  font-family:'Spline Sans',system-ui,sans-serif !important;
+}
+.scene { border-bottom:1px solid rgba(244,237,226,0.05) !important; }
+.scene:hover, .scene.current { background:rgba(194,90,50,0.2) !important; }
+.scene .text, .scene-name {
+  color:rgba(244,237,226,0.8) !important;
+  font-size:0.85rem !important;
+  padding:0.8rem 1.2rem !important;
+  display:block;
+}
+
+/* Hamburger menu button */
+#menu-toggle, .scenes-controls, #sceneListToggle {
+  background:rgba(10,8,6,0.5) !important;
+  backdrop-filter:blur(8px) !important;
+  border:1px solid rgba(244,237,226,0.15) !important;
+  border-radius:3px !important;
+}
+
+/* Fullscreen button — bottom right */
+#fullscreenToggle, #fullscreen-toggle {
+  position:absolute !important;
+  bottom:1.5rem !important;right:1.5rem !important;
+  background:rgba(10,8,6,0.5) !important;
+  backdrop-filter:blur(8px) !important;
+  border:1px solid rgba(244,237,226,0.2) !important;
+  border-radius:3px !important;
+  color:rgba(244,237,226,0.75) !important;
+  transition:all .3s !important;
+  z-index:150 !important;
+}
+#fullscreenToggle:hover, #fullscreen-toggle:hover {
+  background:rgba(194,90,50,0.85) !important;
+  border-color:transparent !important;
+}
+
+/* Navigation hotspot arrows — big circle with bold chevron */
+.link-hotspot{
+  position:relative;
+  width:72px;height:72px;
+  display:grid;place-items:center;
+  border-radius:50%;
+  background:rgba(26,20,16,0.45);
+  border:2px solid rgba(255,255,255,0.85);
+  backdrop-filter:blur(4px);
+  color:#fff;
+  cursor:pointer;
+  box-shadow:0 6px 22px rgba(0,0,0,0.35);
+  transition:transform .2s ease,background .2s ease,box-shadow .2s ease;
+}
+.link-hotspot svg{ width:34px;height:34px; }
+.link-hotspot:hover{
+  transform:scale(1.1);
+  background:var(--accent,#c25a32);
+  box-shadow:0 8px 28px rgba(194,90,50,0.5);
+}
+.link-hotspot-tooltip {
+  position:absolute;
+  top:calc(100% + 10px);left:50%;
+  transform:translateX(-50%);
+  background:rgba(10,8,6,0.85) !important;
+  backdrop-filter:blur(8px) !important;
+  border:1px solid rgba(217,154,78,0.3) !important;
+  color:rgba(244,237,226,0.9) !important;
+  font-family:'Spline Sans',system-ui,sans-serif !important;
+  font-size:0.78rem !important;
+  border-radius:2px !important;
+  padding:0.4rem 0.9rem !important;
+  white-space:nowrap;
+  pointer-events:none;
+  opacity:0;transition:opacity .3s;
+}
+.link-hotspot:hover .link-hotspot-tooltip { opacity:1; }
+
+/* Amira bubble — above title bar */
+#amira-bubble { display:none; bottom:6rem !important; }
+#amira-bubble.visible { display:flex; animation:bubbleIn .4s cubic-bezier(0.16,1,0.3,1) forwards; }
+@keyframes bubbleIn {
+  from { opacity:0; transform:translateX(-50%) translateY(12px); }
+  to   { opacity:1; transform:translateX(-50%) translateY(0); }
+}
+
+/* Hide left scene panel — we use the map instead */
+#scenes-list,
+#scene-list,
+.scenes-controls,
+#sceneList,
+.scene-list-wrapper,
+#sceneListToggle,
+#sidebar { display:none !important; }
+
+/* Remove the X / close button */
+.info-hotspot-close-wrapper,
+.info-hotspot-close { display:none !important; }
+</style>
 </head>
-<body>
-  <div class="placeholder">
-    <div class="pulse">🌐</div>
-    <h2>360° Tour Coming Soon</h2>
-    <p>Drop the Marzipano output folder here at <code>/tour/</code> to activate the immersive virtual campus tour.</p>
-  </div>
+<body class="multiple-scenes view-control-buttons">
 
-  <!-- Floating Chatbot (Amira) -->
-  <button class="chat-fab" id="chatFab" aria-label="Open chatbot">
-    <div class="chat-fab-ping"></div>
-    🤖
-  </button>
+<div id="title-bar">
+  <div id="scene-name-display">Entrée principale</div>
+  <div id="scene-counter">01 / 49</div>
+</div>
 
-  <div class="chat-panel" id="chatPanel" role="dialog" aria-label="Amira — Mundiapolis Guide">
-    <div class="cp-header">
-      <div class="cp-avatar">🤖</div>
-      <div class="cp-info">
-        <h4>Amira</h4>
-        <div class="cp-status">● Online</div>
-      </div>
-      <button class="cp-close" id="chatClose" aria-label="Close">✕</button>
-    </div>
-    <div class="cp-body" id="chatBody">
-      <div class="cp-msg cp-msg-bot">👋 Hi! I'm Amira. Ask me anything about Mundiapolis!</div>
-    </div>
-    <div class="cp-footer">
-      <input class="cp-input" id="chatInput" type="text" placeholder="Ask about programs, campus…" autocomplete="off" />
-      <button class="cp-send" id="chatSend" aria-label="Send">➤</button>
+<div id="pano">
+  <div id="amira-bubble" style="position:absolute;bottom:5rem;left:50%;transform:translateX(-50%);z-index:200;max-width:min(520px,85vw);background:rgba(16,12,10,0.88);backdrop-filter:blur(14px);border:1px solid rgba(217,154,78,0.35);border-radius:4px;padding:1rem 1.4rem;gap:0.9rem;align-items:flex-start;box-shadow:0 8px 32px rgba(0,0,0,0.4);">
+    <div style="width:34px;height:34px;border-radius:50%;flex-shrink:0;background:radial-gradient(circle at 35% 30%,#d99a4e,#c25a32);overflow:hidden;background-image:url('/assets/amira-face.png');background-size:cover;background-position:center;"></div>
+    <div>
+      <div style="font-family:'Spline Sans',system-ui;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#d99a4e;margin-bottom:0.35rem;font-weight:600;">Amira · Guide</div>
+      <div id="amira-bubble-text" style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:300;font-size:0.95rem;line-height:1.6;color:rgba(244,237,226,0.92);"></div>
     </div>
   </div>
+</div>
 
-  <script>
-    // Update for production: set to your deployed chatbot server URL
-    const CHATBOT_API = 'http://localhost:3000';
+<div id="sceneList">
+  <ul class="scenes">
+    
+      <a href="javascript:void(0)" class="scene" data-id="0-labo-electronique">
+        <li class="text">Laboratoire d'Électronique</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="1-bm-2-eme-etage-m-">
+        <li class="text">Bâtiment Management — 2ème étage</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="2-bm-2-eme-etage-d-">
+        <li class="text">Bâtiment Management — 2ème étage</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="3-labo-optique">
+        <li class="text">Laboratoire d'Optique</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="4-labo-electicite">
+        <li class="text">Laboratoire d'Électricité</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="5-bg-2-eme-etage-d">
+        <li class="text">Bâtiment Génie — 2ème étage</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="6-bg-2-eme-etage-m">
+        <li class="text">Bâtiment Génie — 2ème étage</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="7-labo-chimique">
+        <li class="text">Laboratoire de Chimie</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="8-bg-3-eme-etage-d">
+        <li class="text">Bâtiment Génie — 3ème étage</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="9-bg-3-eme-etage-m">
+        <li class="text">Bâtiment Génie — 3ème étage</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="10-bg-1-er-etage-d">
+        <li class="text">Bâtiment Génie — 1er étage</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="11-bg-1-er-etage-m">
+        <li class="text">Bâtiment Génie — 1er étage</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="12-administration">
+        <li class="text">Administration</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="13-bg-rdc1">
+        <li class="text">Bâtiment Génie — Rez-de-chaussée</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="14-bg-rdc2">
+        <li class="text">Bâtiment Génie — Rez-de-chaussée</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="15-usine-de-savon">
+        <li class="text">Atelier Sciences Industrielles</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="16-rdm-et-mecanique-des-fluides">
+        <li class="text">Résistance des Matériaux</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="17-biblio-escalier">
+        <li class="text">Bibliothèque — Escalier</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="18-bm-rdc2">
+        <li class="text">Bâtiment Management — Rez-de-chaussée</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="19-bm-rdc1">
+        <li class="text">Bâtiment Management — Rez-de-chaussée</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="20-bm-1-er-etage-m">
+        <li class="text">Bâtiment Management — 1er étage</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="21-bm--1-er-etage-d">
+        <li class="text">Bâtiment Management — 1er étage</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="22-bm-3-eme-etage-d">
+        <li class="text">Bâtiment Management — 3ème étage</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="23-bm-3-eme-etage-m">
+        <li class="text">Bâtiment Management — 3ème étage</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="24-cite-universitaire-4">
+        <li class="text">Cité Universitaire</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="25-cite-universitaire-m">
+        <li class="text">Cité Universitaire — Couloir</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="26-cite-universitaire-l-internat">
+        <li class="text">Cité Universitaire — Internat</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="27-1000462463">
+        <li class="text">Campus — Vue extérieure</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="28-cite-universitaire-1">
+        <li class="text">Cité Universitaire</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="29-cite-universitaire-3">
+        <li class="text">Cité Universitaire</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="30-terrain-de-foot">
+        <li class="text">Terrain de Football</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="31-cite-universitaire-2">
+        <li class="text">Cité Universitaire</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="32-biblio-1">
+        <li class="text">Bibliothèque — Salle principale</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="33-biblio-2">
+        <li class="text">Bibliothèque — Salle de lecture</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="34-entree-1">
+        <li class="text">Entrée principale</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="35-entree-de-la-bibliotheque">
+        <li class="text">Entrée de la Bibliothèque</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="36-entree-2">
+        <li class="text">Entrée du campus</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="37-mosquee">
+        <li class="text">Mosquée du campus</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="38-buvette-1">
+        <li class="text">Cafétéria</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="39-salle-de-conference">
+        <li class="text">Amphithéâtre</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="40-buvette-2">
+        <li class="text">Espace Restauration</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="41-salle-de-sport-">
+        <li class="text">Complexe Sportif</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="42-salle-de-sport-1-er-etage">
+        <li class="text">Complexe Sportif — 1er étage</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="43-salle-de-sport-musculation">
+        <li class="text">Salle de Musculation</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="44-salle-de-sport--martial-art">
+        <li class="text">Salle d'Arts Martiaux</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="45-salle-de-sport-rdc">
+        <li class="text">Complexe Sportif — RDC</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="46-salle-de-sport-piscine">
+        <li class="text">Piscine</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="47-cite-universitaire-entree-salle-de-sport">
+        <li class="text">Cité Universitaire — Entrée Sport</li>
+      </a>
+    
+      <a href="javascript:void(0)" class="scene" data-id="48-cite-universitaire-5">
+        <li class="text">Cité Universitaire — Extérieur</li>
+      </a>
+    
+  </ul>
+</div>
 
-    const chatFab   = document.getElementById('chatFab');
-    const chatPanel = document.getElementById('chatPanel');
-    const chatClose = document.getElementById('chatClose');
-    const chatInput = document.getElementById('chatInput');
-    const chatSend  = document.getElementById('chatSend');
-    const chatBody  = document.getElementById('chatBody');
-    let chatHistory = [];
+<div id="titleBar" style="display:none"></div>
 
-    function toggleChat(open) {
-      const isOpen = open !== undefined ? open : !chatPanel.classList.contains('is-open');
-      chatPanel.classList.toggle('is-open', isOpen);
-      chatFab.classList.toggle('is-open', isOpen);
-      if (isOpen) {
-        chatFab.querySelector('.chat-fab-ping').style.display = 'none';
-        setTimeout(() => chatInput.focus(), 350);
-      }
-    }
+<a href="javascript:void(0)" id="autorotateToggle">
+  <img class="icon off" src="img/play.png">
+  <img class="icon on" src="img/pause.png">
+</a>
 
-    function appendMsg(text, type) {
-      const div = document.createElement('div');
-      div.className = 'cp-msg cp-msg-' + type;
-      div.textContent = text;
-      chatBody.appendChild(div);
-      chatBody.scrollTop = chatBody.scrollHeight;
-    }
+<a href="javascript:void(0)" id="fullscreenToggle">
+  <img class="icon off" src="img/fullscreen.png">
+  <img class="icon on" src="img/windowed.png">
+</a>
 
-    function showTyping() {
-      const t = document.createElement('div');
-      t.className = 'cp-typing'; t.id = 'cpTyping';
-      t.innerHTML = '<span></span><span></span><span></span>';
-      chatBody.appendChild(t);
-      chatBody.scrollTop = chatBody.scrollHeight;
-      return t;
-    }
+<a href="javascript:void(0)" id="sceneListToggle">
+  <img class="icon off" src="img/expand.png">
+  <img class="icon on" src="img/collapse.png">
+</a>
 
-    async function sendMessage() {
-      const text = chatInput.value.trim();
-      if (!text) return;
-      appendMsg(text, 'user');
-      chatInput.value = '';
-      chatSend.disabled = true;
-      const typing = showTyping();
+<a href="javascript:void(0)" id="viewUp" class="viewControlButton viewControlButton-1">
+  <img class="icon" src="img/up.png">
+</a>
+<a href="javascript:void(0)" id="viewDown" class="viewControlButton viewControlButton-2">
+  <img class="icon" src="img/down.png">
+</a>
+<a href="javascript:void(0)" id="viewLeft" class="viewControlButton viewControlButton-3">
+  <img class="icon" src="img/left.png">
+</a>
+<a href="javascript:void(0)" id="viewRight" class="viewControlButton viewControlButton-4">
+  <img class="icon" src="img/right.png">
+</a>
+<a href="javascript:void(0)" id="viewIn" class="viewControlButton viewControlButton-5">
+  <img class="icon" src="img/plus.png">
+</a>
+<a href="javascript:void(0)" id="viewOut" class="viewControlButton viewControlButton-6">
+  <img class="icon" src="img/minus.png">
+</a>
 
-      try {
-        const res = await fetch(`${CHATBOT_API}/api/chat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text, history: chatHistory }),
-        });
-        typing.remove();
-        if (!res.ok) throw new Error('Server error');
-        const data = await res.json();
-        appendMsg(data.reply, 'bot');
-        chatHistory.push({ role: 'user', content: text });
-        chatHistory.push({ role: 'assistant', content: data.reply });
-        if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
-      } catch (err) {
-        typing.remove();
-        appendMsg("Oops, I'm having trouble connecting. Try again in a moment?", 'bot');
-      } finally {
-        chatSend.disabled = false;
-        chatInput.focus();
-      }
-    }
+<script src="vendor/screenfull.min.js" ></script>
+<script src="vendor/bowser.min.js" ></script>
+<script src="vendor/marzipano.js" ></script>
 
-    chatFab.addEventListener('click', () => toggleChat());
-    chatClose.addEventListener('click', () => toggleChat(false));
-    chatSend.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && chatPanel.classList.contains('is-open')) toggleChat(false);
-    });
-  </script>
+<script src="data.js"></script>
+<script src="index.js"></script>
+
+<!-- Amira slide-up card -->
+<div id="amira-card" style="
+  position:fixed;bottom:-160px;left:50%;transform:translateX(-50%);
+  width:min(520px,88vw);
+  background:rgba(12,9,6,0.92);
+  backdrop-filter:blur(16px);
+  border:1px solid rgba(217,154,78,0.3);
+  border-radius:6px 6px 0 0;
+  padding:1.1rem 1.4rem;
+  display:flex;gap:1rem;align-items:flex-start;
+  z-index:500;
+  transition:bottom .5s cubic-bezier(0.16,1,0.3,1);
+  box-shadow:0 -8px 40px rgba(0,0,0,0.5);
+">
+  <div style="
+    width:42px;height:42px;border-radius:50%;flex-shrink:0;
+    background:radial-gradient(circle at 35% 30%,#d99a4e,#c25a32);
+    overflow:hidden;
+    background-image:url('/assets/amira-face.png');
+    background-size:cover;background-position:center;
+  "></div>
+  <div style="flex:1;min-width:0;">
+    <div style="font-family:'Spline Sans',system-ui;font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:#d99a4e;margin-bottom:0.3rem;font-weight:600;">Amira · Guide</div>
+    <div id="amira-card-scene" style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:0.78rem;color:rgba(244,237,226,0.5);margin-bottom:0.3rem;"></div>
+    <div id="amira-card-text" style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:300;font-size:0.95rem;line-height:1.55;color:rgba(244,237,226,0.92);"></div>
+  </div>
+  <button id="amira-card-close" style="
+    background:none;border:none;color:rgba(244,237,226,0.4);
+    cursor:pointer;font-size:1.1rem;padding:0;flex-shrink:0;
+    transition:color .3s;
+  ">×</button>
+</div>
+
+<!-- Amira voice toggle -->
+<button id="amira-voice-toggle" title="Activer/désactiver la voix d'Amira" style="
+  position:fixed;bottom:1.5rem;left:1.5rem;z-index:9999;
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(10,8,6,0.7);backdrop-filter:blur(8px);
+  border:1px solid rgba(244,237,226,0.25);
+  color:rgba(244,237,226,0.8);font-size:1.1rem;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .3s;
+" aria-label="Toggle Amira voice">🔊</button>
+
 </body>
 </html>
