@@ -24,24 +24,24 @@
   var amiraVoiceEnabled = true;
 
   var AMIRA_LINES = {
-    '34-entree-1': "Bienvenue à Mundiapolis ! Vous êtes à l'entrée principale du campus. Une université internationale au cœur de Casablanca.",
-    '36-entree-2': "Voici l'entrée extérieure du campus, entourée de palmiers et d'une architecture distincte.",
-    '32-biblio-1': "La bibliothèque universitaire — plus de 50 000 ouvrages, des espaces de travail modernes et une vue sur le campus.",
-    '33-biblio-2': "La salle de lecture de la bibliothèque — calme, lumineuse, idéale pour les révisions.",
-    '0-labo-electronique': "Le laboratoire d'électronique, équipé d'oscilloscopes et de stations de mesure pour les travaux pratiques.",
-    '3-labo-optique': "Le laboratoire d'optique — expériences sur la lumière, les fibres optiques et les phénomènes ondulatoires.",
-    '4-labo-electicite': "Le laboratoire d'électricité, dédié aux circuits et aux systèmes électriques.",
-    '7-labo-chimique': "Le laboratoire de chimie — sécurisé et équipé pour les expériences de chimie générale et organique.",
-    '39-salle-de-conference': "L'amphithéâtre de Mundiapolis — il accueille conférences, soutenances et événements académiques majeurs.",
-    '38-buvette-1': "La cafétéria du campus — un espace convivial pour se retrouver entre cours.",
-    '40-buvette-2': "L'espace restauration extérieur — parfait pour déjeuner en plein air.",
-    '37-mosquee': "La mosquée du campus, ouverte à toute la communauté universitaire.",
-    '41-salle-de-sport-': "Le complexe sportif de Mundiapolis — terrains, salles et équipements pour une vie sportive active.",
-    '46-salle-de-sport-piscine': "La piscine universitaire — un équipement rare dans les campus marocains.",
-    '43-salle-de-sport-musculation': "La salle de musculation, disponible pour tous les étudiants.",
-    '30-terrain-de-foot': "Le terrain de football, au cœur du campus et des activités sportives étudiantes.",
-    '12-administration': "Le bâtiment administratif — inscriptions, scolarité et services aux étudiants.",
-    '24-cite-universitaire-4': "La cité universitaire — résidences modernes pour les étudiants qui choisissent de vivre sur le campus.",
+    '34-entree-1': "Bienvenue au campus de Nouaceur — l'École d'Ingénierie de Mundiapolis. C'est par ici que passent chaque matin les futurs ingénieurs en informatique, industriel et aéronautique. Le campus est à vous.",
+    '36-entree-2': "L'entrée du campus. On est à Nouaceur, aux portes de l'aéroport de Casablanca — pas un hasard quand on forme des ingénieurs en systèmes aéronautiques.",
+    '32-biblio-1': "La bibliothèque. C'est ici que la moitié des ingénieurs de Mundiapolis ont survécu à leurs partiels — et où les meilleures idées de projets naissent à voix basse.",
+    '33-biblio-2': "La salle de lecture. Si vous cherchez une place près de la fenêtre en période d'examens, levez-vous tôt — tout le monde a la même idée.",
+    '0-labo-electronique': "Le labo d'électronique. Oscilloscopes, circuits, et beaucoup d'essais-erreurs. C'est normal de rater le premier TP — on apprend en faisant, c'est tout l'esprit de l'école.",
+    '3-labo-optique': "Le labo d'optique. La lumière, les fibres, les ondes — la théorie des amphis devient tangible sur ces paillasses.",
+    '4-labo-electicite': "Le labo d'électricité. Les circuits qu'on dessine en cours, on les construit vraiment ici.",
+    '7-labo-chimique': "Le labo de chimie. Sérieux, sécurisé — et le seul endroit du campus où la blouse devient un réflexe.",
+    '39-salle-de-conference': "L'amphithéâtre. Conférences, soutenances de projets de fin d'études, et la finale du championnat Inter-Class. La grande salle des grands moments.",
+    '38-buvette-1': "La cafétéria. Le vrai cœur social du campus — c'est ici que se forment les binômes de projet et que les pauses s'éternisent un peu trop.",
+    '40-buvette-2': "L'espace en plein air. Aux beaux jours casablancais — c'est-à-dire presque toute l'année — c'est la meilleure place pour déjeuner.",
+    '37-mosquee': "La mosquée du campus, ouverte à toute la communauté. Un coin de calme entre deux TP.",
+    '41-salle-de-sport-': "Le complexe sportif. Entre deux cours d'ingénierie, c'est ici qu'on décompresse — et que se jouent les rivalités du championnat Inter-Class.",
+    '46-salle-de-sport-piscine': "La piscine. Oui, une vraie piscine sur un campus d'ingénieurs à Nouaceur — c'est rare, profitez-en.",
+    '43-salle-de-sport-musculation': "La salle de musculation, ouverte à tous les étudiants — parce qu'on révise mieux après avoir bougé.",
+    '30-terrain-de-foot': "Le terrain et les espaces verts. Le poumon du campus — matchs improvisés, révisions sur l'herbe, et un peu d'air entre deux amphis.",
+    '12-administration': "L'administration et l'infirmerie. Inscriptions, scolarité, et le genre d'endroit qu'on espère ne pas trop fréquenter — mais qui dépanne.",
+    '26-cite-universitaire-l-internat': "La cité universitaire. Pour celles et ceux qui font de Nouaceur leur maison le temps des études. C'est ici que se termine la visite — mais que commence votre histoire d'ingénieur.",
   };
 
   // Grab elements from DOM.
@@ -146,20 +146,6 @@
   // Set up fullscreen mode, if supported.
   if (screenfull.enabled && data.settings.fullscreenButton) {
     document.body.classList.add('fullscreen-enabled');
-    fullscreenToggleElement.addEventListener('click', function() {
-      if(window.parent && window.parent !== window){
-        window.parent.postMessage({type:'requestFullscreen'}, '*');
-      } else {
-        document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
-      }
-    });
-    screenfull.on('change', function() {
-      if (screenfull.isFullscreen) {
-        fullscreenToggleElement.classList.add('enabled');
-      } else {
-        fullscreenToggleElement.classList.remove('enabled');
-      }
-    });
   } else {
     document.body.classList.add('fullscreen-disabled');
   }
@@ -484,14 +470,62 @@
   }
   switchScene(startScene);
 
-  // Listen for scene switch messages from parent page
+  // ── Listen for scene switch requests from the parent page ──
   window.addEventListener('message', function(e){
-    if(e.data && e.data.type === 'switchScene' && e.data.sceneId){
-      var target = findSceneById(e.data.sceneId);
-      if(target){
+    if(!e.data || e.data.type !== 'switchScene' || !e.data.sceneId) return;
+
+    var targetId = e.data.sceneId;
+    var target = null;
+    for(var i = 0; i < scenes.length; i++){
+      if(scenes[i].data && scenes[i].data.id === targetId){
+        target = scenes[i];
+        break;
+      }
+    }
+
+    if(target){
+      if(typeof switchScene === 'function'){
         switchScene(target);
+      } else if(target.scene && typeof target.scene.switchTo === 'function'){
+        target.scene.switchTo();
+      }
+    } else {
+      console.warn('switchScene: no scene found with id', targetId);
+    }
+  });
+
+})();
+
+// ── Fullscreen toggle (posts to parent since we're in an iframe) ──
+(function(){
+  var btn = document.getElementById('fullscreenToggle');
+  if(!btn){
+    btn = document.querySelector('.fullscreen-toggle') ||
+          document.querySelector('[id*="fullscreen"]') ||
+          document.querySelector('[class*="fullscreen"]');
+  }
+  if(!btn) return;
+
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    if(window.parent && window.parent !== window){
+      window.parent.postMessage({type:'toggleFullscreen'}, '*');
+    } else {
+      if(!document.fullscreenElement){
+        (document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen).call(document.documentElement);
+      } else {
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
       }
     }
   });
 
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.type === 'fullscreenState'){
+      if(e.data.active){
+        btn.classList.add('enabled');
+      } else {
+        btn.classList.remove('enabled');
+      }
+    }
+  });
 })();

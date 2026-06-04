@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mundiapolis University — Walk the Campus</title>
+<title>Université Mundiapolis — Visitez le campus</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..700&family=Spline+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -468,6 +468,128 @@
     .nav-links{display:none;}
     .intro-meta{flex-wrap:wrap;gap:1.5rem;}
   }
+
+  /* Typing indicator */
+  .typing{display:flex;gap:4px;padding:0.8rem 1.1rem;align-self:flex-start;}
+  .typing span{
+    width:7px;height:7px;border-radius:50%;background:rgba(244,237,226,0.5);
+    animation:typing 1.3s infinite ease-in-out;
+  }
+  .typing span:nth-child(2){animation-delay:0.2s;}
+  .typing span:nth-child(3){animation-delay:0.4s;}
+  @keyframes typing{0%,60%,100%{transform:translateY(0);opacity:0.4;}30%{transform:translateY(-5px);opacity:1;}}
+
+  /* Speaking animation on avatar */
+  .gc-avatar.speaking{animation:speak-pulse 1s infinite;}
+  @keyframes speak-pulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(217,154,78,0.5);}
+    50%{box-shadow:0 0 0 6px rgba(217,154,78,0);}
+  }
+
+  /* Suggestion chips */
+  .gc-chips{display:flex;flex-wrap:wrap;gap:0.5rem;padding:0 1.5rem 1rem;}
+  .chip{
+    background:rgba(244,237,226,0.08);border:1px solid rgba(244,237,226,0.18);
+    color:rgba(244,237,226,0.85);border-radius:20px;padding:0.45rem 0.9rem;
+    font-family:var(--sans);font-size:0.8rem;cursor:pointer;
+    transition:all .25s var(--ease);white-space:nowrap;
+  }
+  .chip:hover{background:var(--terracotta);border-color:transparent;color:var(--paper);transform:translateY(-1px);}
+  .gc-chips.hidden{display:none;}
+
+  /* Action button inside a bubble (jump to tour scene) */
+  .bub .visit-btn{
+    display:inline-flex;align-items:center;gap:0.4rem;margin-top:0.6rem;
+    background:var(--ochre);color:var(--ink);border:none;border-radius:3px;
+    padding:0.4rem 0.8rem;font-family:var(--sans);font-size:0.78rem;font-weight:600;
+    cursor:pointer;transition:all .25s;
+  }
+  .bub .visit-btn:hover{background:var(--terracotta);color:var(--paper);}
+
+  /* ─── Floating Amira chat panel ─── */
+  .amira-panel{
+    position:fixed;bottom:1.8rem;right:1.8rem;z-index:1600;
+    width:min(380px,calc(100vw - 2rem));
+    height:min(560px,calc(100vh - 7rem));
+    background:rgba(18,14,11,0.92);
+    backdrop-filter:blur(20px);
+    border:1px solid rgba(217,154,78,0.25);
+    border-radius:10px;
+    display:flex;flex-direction:column;overflow:hidden;
+    box-shadow:0 30px 70px -15px rgba(0,0,0,0.6);
+    transform:translateY(30px) scale(0.92);
+    opacity:0;pointer-events:none;
+    transform-origin:bottom right;
+    transition:transform .45s cubic-bezier(0.16,1,0.3,1),opacity .35s ease;
+  }
+  .amira-panel.open{
+    transform:translateY(0) scale(1);
+    opacity:1;pointer-events:auto;
+  }
+
+  .ap-head{
+    display:flex;align-items:center;gap:0.8rem;padding:1rem 1.2rem;
+    border-bottom:1px solid rgba(244,237,226,0.08);
+    background:rgba(28,23,20,0.5);
+  }
+  .ap-avatar{
+    width:42px;height:42px;border-radius:50%;overflow:hidden;flex-shrink:0;
+    background:radial-gradient(circle at 35% 30%,var(--ochre),var(--terracotta));
+  }
+  .ap-avatar img{width:100%;height:100%;object-fit:cover;}
+  .ap-avatar.speaking{animation:ap-pulse 1s infinite;}
+  @keyframes ap-pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,154,78,0.5);}50%{box-shadow:0 0 0 7px rgba(217,154,78,0);}}
+  .ap-name{font-family:var(--serif);color:var(--paper);font-size:1.05rem;}
+  .ap-status{color:var(--sage);font-size:0.72rem;display:flex;align-items:center;gap:0.4rem;margin-top:0.1rem;}
+  .ap-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--sage);}
+  .ap-meta{flex:1;min-width:0;}
+  .ap-close{background:none;border:none;color:rgba(244,237,226,0.5);font-size:1.5rem;cursor:pointer;line-height:1;transition:color .3s;}
+  .ap-close:hover{color:var(--paper);}
+
+  .ap-body{
+    flex:1;overflow-y:auto;padding:1.2rem;
+    display:flex;flex-direction:column;gap:0.8rem;
+  }
+  .ap-body .bub{padding:0.75rem 1rem;border-radius:14px;font-size:0.9rem;max-width:85%;line-height:1.5;}
+  .ap-body .bub.a{background:rgba(244,237,226,0.08);color:rgba(244,237,226,0.92);border-radius:4px 14px 14px 14px;align-self:flex-start;}
+  .ap-body .bub.u{background:var(--terracotta);color:var(--paper);border-radius:14px 4px 14px 14px;align-self:flex-end;}
+  .ap-body .visit-btn{
+    display:inline-flex;align-items:center;gap:0.4rem;margin-top:0.6rem;
+    background:var(--ochre);color:var(--ink);border:none;border-radius:3px;
+    padding:0.4rem 0.8rem;font-family:var(--sans);font-size:0.76rem;font-weight:600;cursor:pointer;transition:all .25s;
+  }
+  .ap-body .visit-btn:hover{background:var(--terracotta);color:var(--paper);}
+
+  .ap-chips{display:flex;flex-wrap:wrap;gap:0.45rem;padding:0 1.2rem 0.8rem;}
+  .ap-chips.hidden{display:none;}
+  .ap-chips .chip{
+    background:rgba(244,237,226,0.08);border:1px solid rgba(244,237,226,0.18);
+    color:rgba(244,237,226,0.85);border-radius:20px;padding:0.4rem 0.85rem;
+    font-family:var(--sans);font-size:0.78rem;cursor:pointer;transition:all .25s;white-space:nowrap;
+  }
+  .ap-chips .chip:hover{background:var(--terracotta);border-color:transparent;color:var(--paper);}
+
+  .ap-foot{display:flex;gap:0.6rem;padding:0.9rem 1.2rem;border-top:1px solid rgba(244,237,226,0.08);}
+  .ap-foot input{
+    flex:1;background:rgba(244,237,226,0.06);border:1px solid rgba(244,237,226,0.12);
+    border-radius:2px;padding:0.65rem 0.9rem;color:var(--paper);font-family:var(--sans);
+    font-size:0.88rem;outline:none;transition:border-color .3s;
+  }
+  .ap-foot input::placeholder{color:rgba(244,237,226,0.35);}
+  .ap-foot input:focus{border-color:var(--ochre);}
+  .ap-foot button{background:var(--terracotta);border:none;color:var(--paper);width:40px;border-radius:2px;cursor:pointer;font-size:1rem;flex-shrink:0;transition:background .3s;}
+  .ap-foot button:hover{background:var(--terracotta-d);}
+
+  .ap-body .typing{display:flex;gap:4px;padding:0.7rem 1rem;align-self:flex-start;}
+  .ap-body .typing span{width:7px;height:7px;border-radius:50%;background:rgba(244,237,226,0.5);animation:typing 1.3s infinite ease-in-out;}
+  .ap-body .typing span:nth-child(2){animation-delay:0.2s;}
+  .ap-body .typing span:nth-child(3){animation-delay:0.4s;}
+
+  .fab.hidden{opacity:0;pointer-events:none;transform:scale(0.5);}
+
+  @media(max-width:480px){
+    .amira-panel{right:0.5rem;left:0.5rem;width:auto;bottom:0.5rem;height:min(70vh,560px);}
+  }
 </style>
 </head>
 <body>
@@ -476,46 +598,46 @@
 <nav>
   <a href="#" class="logo">Mundiapolis<em>360</em></a>
   <ul class="nav-links">
-    <li><a href="#intro">The Project</a></li>
-    <li><a href="#tour">The Tour</a></li>
-    <li><a href="#places">Places</a></li>
+    <li><a href="#intro">Le Projet</a></li>
+    <li><a href="#tour">La Visite</a></li>
+    <li><a href="#places">Les Lieux</a></li>
     <li><a href="#guide">Amira</a></li>
-    <li><a href="#cta">Begin</a></li>
+    <li><a href="#cta">Commencer</a></li>
   </ul>
 </nav>
 
 <!-- HERO -->
 <header id="hero">
   <div class="hero-left">
-    <div class="hero-kicker">Mundiapolis University · Casablanca</div>
+    <div class="hero-kicker">École d'Ingénierie · Campus de Nouaceur, Casablanca</div>
     <h1 class="hero-title">
-      <span class="l"><span>Walk the</span></span>
-      <span class="l"><span>campus before</span></span>
-      <span class="l"><span>you <em>arrive.</em></span></span>
+      <span class="l"><span>Visitez le</span></span>
+      <span class="l"><span>campus avant</span></span>
+      <span class="l"><span>d'y <em>arriver.</em></span></span>
     </h1>
-    <p class="hero-sub">An immersive 360° tour of Mundiapolis, with a guide who answers every question along the way — in your language, in real time.</p>
+    <p class="hero-sub">Le campus de Nouaceur — l'École d'Ingénierie de Mundiapolis, aux portes de l'aéroport de Casablanca. Parcourez les labos, les amphis et les terrains où se forment les ingénieurs de demain, guidé par Amira qui répond à vos questions en français, anglais ou arabe.</p>
     <div class="hero-actions">
-      <a href="#tour" class="btn btn-solid">Begin the tour <span class="arr">→</span></a>
-      <a href="#guide" class="btn btn-ghost">Meet Amira</a>
+      <a href="#tour" class="btn btn-solid">Commencer la visite <span class="arr">→</span></a>
+      <a href="#guide" class="btn btn-ghost">Rencontrer Amira</a>
     </div>
   </div>
   <div class="hero-right">
     <div id="hero-pano"></div>
     <div class="hero-plate">
-      <div class="plate-coords">33.5731° N<br>7.5898° W<br>—<br>Casablanca, MA</div>
+      <div class="plate-coords">33.38° N<br>7.57° W<br>—<br>Nouaceur, Casablanca<br><span id="casa-time" style="color:rgba(217,154,78,0.75);"></span></div>
       <div class="plate-frame">
-        <span class="plate-label">Campus · main view</span>
+        <span class="plate-label">Campus · vue principale</span>
       </div>
     </div>
-    <div class="scroll-cue"><span class="dot"></span> Scroll to enter</div>
+    <div class="scroll-cue"><span class="dot"></span> Défiler pour entrer</div>
   </div>
 </header>
 
 <!-- STRIP -->
 <div class="strip">
   <div class="strip-track">
-    <span>Eight locations</span><span>One AI guide</span><span>Three languages</span><span>Zero travel</span>
-    <span>Eight locations</span><span>One AI guide</span><span>Three languages</span><span>Zero travel</span>
+    <span>Campus de Nouaceur</span><span>École d'Ingénierie</span><span>91% d'employabilité</span><span>Une guide IA</span>
+    <span>Campus de Nouaceur</span><span>École d'Ingénierie</span><span>91% d'employabilité</span><span>Une guide IA</span>
   </div>
 </div>
 
@@ -523,16 +645,16 @@
 <section id="intro">
   <div class="wrap intro-grid">
     <div class="reveal">
-      <div class="eyebrow">The Project</div>
-      <p class="intro-lead">A campus is more than buildings. It's the <em>feeling</em> of standing in a courtyard, deciding where to go next.</p>
+      <div class="eyebrow">Le Projet</div>
+      <p class="intro-lead">Un campus d'ingénieurs, c'est plus que des bâtiments. C'est l'odeur d'un labo, la <em>tension</em> d'une soutenance, un terrain à la pause de midi.</p>
     </div>
     <div class="intro-body reveal">
-      <p>Most prospective students judge a university from a brochure or a pin on a map. We wanted something closer to the truth — a way to actually move through Mundiapolis, room by room, from anywhere in the world.</p>
-      <p>So we built one. A 360° tour powered by Marzipano, paired with Amira, an AI guide who knows the campus and answers in English, French, or Arabic — whichever you speak to her in.</p>
+      <p>La plupart des futurs ingénieurs choisissent une école sur une brochure ou une moyenne d'employabilité. Nous voulions quelque chose de plus honnête — une façon de parcourir réellement le campus de Nouaceur, du labo d'électronique au terrain de foot, avant même de s'inscrire.</p>
+      <p>Ce site a été construit par un étudiant en ingénierie de Mundiapolis — quelqu'un qui parcourt ces couloirs tous les jours. La carte, la visite et Amira sont nées d'une idée simple : montrer le campus tel qu'on le vit. C'est ça, l'apprentissage par projet — on nous demande de construire des choses dès la première année. Celle-ci en est une.</p>
       <div class="intro-meta">
-        <div class="meta-item"><div class="n">8</div><div class="t">Locations</div></div>
-        <div class="meta-item"><div class="n">360<em>°</em></div><div class="t">Panoramic</div></div>
-        <div class="meta-item"><div class="n">3</div><div class="t">Languages</div></div>
+        <div class="meta-item"><div class="n">91<em>%</em></div><div class="t">Employabilité</div></div>
+        <div class="meta-item"><div class="n">2+3</div><div class="t">Prépa + cycle ingénieur</div></div>
+        <div class="meta-item"><div class="n">1<em>/19</em></div><div class="t">Prof. par étudiant</div></div>
       </div>
     </div>
   </div>
@@ -543,10 +665,10 @@
   <div class="wrap">
     <div class="tour-head reveal">
       <div>
-        <div class="eyebrow">The Experience</div>
-        <h2 class="h2">Step <em>inside</em></h2>
+        <div class="eyebrow">L'Expérience</div>
+        <h2 class="h2">Entrez à <em>l'intérieur</em></h2>
       </div>
-      <p>Drag to look around. Click the markers to move between spaces. This is the real campus, not a render.</p>
+      <p>Faites glisser pour regarder autour de vous. Cliquez sur les repères pour vous déplacer entre les espaces. C'est le vrai campus, pas une image de synthèse.</p>
     </div>
     <div class="tour-stage reveal">
       <!-- MAP — shown first -->
@@ -571,40 +693,40 @@
 <section id="places">
   <div class="wrap">
     <div class="places-head reveal">
-      <div class="eyebrow">Eight Locations</div>
-      <h2 class="h2">Every corner, <em>worth seeing</em></h2>
-      <p>From the main entrance to the gardens — each space is a stop on the tour. Photography is being added; for now, the map of where you'll go.</p>
+      <div class="eyebrow">Dix Lieux</div>
+      <h2 class="h2">Chaque recoin, <em>vaut le détour</em></h2>
+      <p>Du hall d'entrée aux laboratoires NXP et systèmes embarqués — chaque espace du campus de Nouaceur est une étape de la visite. C'est ici qu'on forme les ingénieurs en informatique, en industriel et en systèmes aéronautiques.</p>
     </div>
     <div class="places-grid">
       <a class="place big reveal" href="#tour" data-scene="34-entree-1">
         <div class="place-surface" data-n="01"></div>
         <div class="go">↗</div>
-        <div class="place-tag"><div class="cat">Arrival</div><h4>Main Entrance</h4></div>
+        <div class="place-tag"><div class="cat">Arrivée</div><h4>Entrée principale</h4></div>
       </a>
       <a class="place med reveal" href="#tour" data-scene="32-biblio-1">
         <div class="place-surface" data-n="02"></div>
         <div class="go">↗</div>
-        <div class="place-tag"><div class="cat">Study</div><h4>Central Library</h4></div>
+        <div class="place-tag"><div class="cat">Études</div><h4>Bibliothèque centrale</h4></div>
       </a>
       <a class="place sm reveal" href="#tour" data-scene="0-labo-electronique">
         <div class="place-surface" data-n="03"></div>
         <div class="go">↗</div>
-        <div class="place-tag"><div class="cat">Faculty</div><h4>Engineering</h4></div>
+        <div class="place-tag"><div class="cat">Faculté</div><h4>Ingénierie</h4></div>
       </a>
       <a class="place med reveal" href="#tour" data-scene="41-salle-de-sport-">
         <div class="place-surface" data-n="04"></div>
         <div class="go">↗</div>
-        <div class="place-tag"><div class="cat">Athletics</div><h4>Sports Complex</h4></div>
+        <div class="place-tag"><div class="cat">Sport</div><h4>Complexe sportif</h4></div>
       </a>
       <a class="place sm reveal" href="#tour" data-scene="38-buvette-1">
         <div class="place-surface" data-n="05"></div>
         <div class="go">↗</div>
-        <div class="place-tag"><div class="cat">Social</div><h4>Student Lounge</h4></div>
+        <div class="place-tag"><div class="cat">Vie sociale</div><h4>Espace étudiant</h4></div>
       </a>
       <a class="place wide reveal" href="#tour" data-scene="39-salle-de-conference">
         <div class="place-surface" data-n="06"></div>
         <div class="go">↗</div>
-        <div class="place-tag"><div class="cat">Events</div><h4>The Amphitheater</h4></div>
+        <div class="place-tag"><div class="cat">Événements</div><h4>L'Amphithéâtre</h4></div>
       </a>
       <!-- Gardens card with slideshow — 3 stacked surfaces, JS cycles them -->
       <a class="place med reveal place-slideshow" href="#tour" data-scene="30-terrain-de-foot" id="gardens-card">
@@ -612,7 +734,7 @@
         <div class="place-surface slide" data-bg="/assets/photos/gardens-2.jpg"></div>
         <div class="place-surface slide" data-bg="/assets/photos/gardens-3.jpg"></div>
         <div class="go">↗</div>
-        <div class="place-tag"><div class="cat">Open Air</div><h4>Campus Gardens</h4></div>
+        <div class="place-tag"><div class="cat">Plein air</div><h4>Jardins du campus</h4></div>
         <div class="slide-dots">
           <span class="sdot active"></span>
           <span class="sdot"></span>
@@ -622,19 +744,44 @@
       <a class="place sm reveal" href="#tour" data-scene="46-salle-de-sport-piscine">
         <div class="place-surface" data-n="08"></div>
         <div class="go">↗</div>
-        <div class="place-tag"><div class="cat">Wellness</div><h4>Swimming Pool</h4></div>
+        <div class="place-tag"><div class="cat">Bien-être</div><h4>Piscine</h4></div>
       </a>
       <a class="place sm reveal" href="#tour" data-scene="43-salle-de-sport-musculation">
         <div class="place-surface" data-n="09"></div>
         <div class="go">↗</div>
-        <div class="place-tag"><div class="cat">Fitness</div><h4>Gym</h4></div>
+        <div class="place-tag"><div class="cat">Fitness</div><h4>Salle de musculation</h4></div>
       </a>
       <a class="place sm reveal" href="#tour" data-scene="37-mosquee">
         <div class="place-surface" data-n="10"></div>
         <div class="go">↗</div>
-        <div class="place-tag"><div class="cat">Spirituality</div><h4>Mosque</h4></div>
+        <div class="place-tag"><div class="cat">Spiritualité</div><h4>Mosquée</h4></div>
       </a>
     </div>
+  </div>
+</section>
+
+<!-- STUDENT VOICES -->
+<section id="voices" style="padding:clamp(6rem,12vh,9rem) 0;background:var(--paper-2);">
+  <div class="wrap">
+    <div class="reveal" style="max-width:40rem;margin-bottom:3rem;">
+      <div class="eyebrow">Celles et ceux qui y sont</div>
+      <h2 class="h2">Le campus, <em>dans leurs mots</em></h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;">
+      <blockquote class="reveal" style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1.8rem;margin:0;">
+        <p style="font-family:var(--serif);font-style:italic;font-size:1.1rem;line-height:1.5;color:var(--ink);margin-bottom:1.2rem;">« J'ai raté mon premier TP au labo d'électronique. Je suis revenu le lendemain — le prof était encore là. C'est là que j'ai compris où j'avais atterri. »</p>
+        <footer style="font-size:0.85rem;color:var(--muted);">Yassine · 2ᵉ année prépa, Génie Informatique</footer>
+      </blockquote>
+      <blockquote class="reveal" style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1.8rem;margin:0;">
+        <p style="font-family:var(--serif);font-style:italic;font-size:1.1rem;line-height:1.5;color:var(--ink);margin-bottom:1.2rem;">« La visite chez Royal Air Maroc, le labo systèmes embarqués… être à Nouaceur, à côté de l'aéroport, ça donne du sens au génie aéronautique. »</p>
+        <footer style="font-size:0.85rem;color:var(--muted);">Salma · Génie des Systèmes Aéronautiques</footer>
+      </blockquote>
+      <blockquote class="reveal" style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1.8rem;margin:0;">
+        <p style="font-family:var(--serif);font-style:italic;font-size:1.1rem;line-height:1.5;color:var(--ink);margin-bottom:1.2rem;">« Ici on apprend par projet, pas par cœur. Mon premier vrai projet a démarré dès la première année — et la finale Inter-Class, c'est sacré. »</p>
+        <footer style="font-size:0.85rem;color:var(--muted);">Mehdi · Génie Industriel</footer>
+      </blockquote>
+    </div>
+    <p style="font-size:0.75rem;color:var(--muted);margin-top:1.5rem;font-style:italic;">Témoignages représentatifs de la vie étudiante au campus de Nouaceur.</p>
   </div>
 </section>
 
@@ -642,29 +789,33 @@
 <section id="guide">
   <div class="wrap guide-grid">
     <div class="guide-copy reveal">
-      <div class="eyebrow">Your Guide</div>
-      <h2 class="h2">Meet <em>Amira</em></h2>
-      <p>She's not a search bar. Amira talks like a student who actually goes here — ask her about programs, admissions, or what the library's like during exams.</p>
+      <div class="eyebrow">Votre Guide</div>
+      <h2 class="h2">Rencontrez <em>Amira</em></h2>
+      <p>Ce n'est pas une barre de recherche. Amira parle comme une étudiante qui fréquente vraiment le campus — interrogez-la sur les programmes, les admissions, ou l'ambiance de la bibliothèque en période d'examens.</p>
       <ul class="guide-feats">
-        <li><span class="k">01</span><span class="v">Speaks English, French, and Arabic — replies in whichever you use</span></li>
-        <li><span class="k">02</span><span class="v">Knows the campus, programs, and student life in detail</span></li>
-        <li><span class="k">03</span><span class="v">Talks back — with a real voice, out loud</span></li>
+        <li><span class="k">01</span><span class="v">Parle anglais, français et arabe — répond dans la langue que vous employez</span></li>
+        <li><span class="k">02</span><span class="v">Connaît le campus, les programmes et la vie étudiante en détail</span></li>
+        <li><span class="k">03</span><span class="v">Vous répond — à voix haute, avec une vraie voix</span></li>
       </ul>
-      <a href="/amira" class="btn btn-solid" target="_blank">Talk to Amira <span class="arr">→</span></a>
+      <a href="/amira" class="btn btn-solid" target="_blank">Parler à Amira en privé <span class="arr">→</span></a>
     </div>
     <div class="guide-card reveal">
       <div class="gc-head">
         <div class="gc-avatar"><img src="/assets/amira-face.png" alt="Amira" /></div>
-        <div><div class="nm">Amira</div><div class="st">Online · your guide</div></div>
+        <div><div class="nm">Amira</div><div class="st" id="gc-status">En ligne · votre guide</div></div>
       </div>
       <div class="gc-body" id="gcBody">
-        <div class="bub a">Hi! I'm Amira 👋 Ask me anything about Mundiapolis.</div>
-        <div class="bub u">What programs do you offer?</div>
-        <div class="bub a">We've got Business, Engineering, Law, and Digital Tech — want me to walk you through any of them?</div>
+        <!-- messages injected by JS -->
+      </div>
+      <!-- Suggestion chips -->
+      <div class="gc-chips" id="gcChips">
+        <button class="chip" data-q="Quelles filières d'ingénierie proposez-vous ?">Filières ?</button>
+        <button class="chip" data-q="Parle-moi des laboratoires">Les labos ?</button>
+        <button class="chip" data-q="Montre-moi la bibliothèque">Voir la bibliothèque</button>
       </div>
       <div class="gc-foot">
-        <input id="gcInput" type="text" placeholder="Ask about Mundiapolis…" autocomplete="off" />
-        <button id="gcSend">➤</button>
+        <input id="gcInput" type="text" placeholder="Posez une question sur Mundiapolis…" autocomplete="off" />
+        <button id="gcSend" aria-label="Envoyer">➤</button>
       </div>
     </div>
   </div>
@@ -674,14 +825,14 @@
 <section id="process">
   <div class="wrap">
     <div class="proc-head reveal">
-      <div class="eyebrow" style="justify-content:center">How It Works</div>
-      <h2 class="h2">Four steps in</h2>
+      <div class="eyebrow" style="justify-content:center">Comment ça marche</div>
+      <h2 class="h2">Quatre étapes</h2>
     </div>
     <div class="proc-grid">
-      <div class="step reveal"><div class="num">Step 01</div><h4>Land here</h4><p>You're already in the right place — this page is the front door.</p></div>
-      <div class="step reveal"><div class="num">Step 02</div><h4>Enter the tour</h4><p>Open the 360° viewer and start moving through the campus.</p></div>
-      <div class="step reveal"><div class="num">Step 03</div><h4>Wander</h4><p>Follow the markers between buildings, or jump straight to a place.</p></div>
-      <div class="step reveal"><div class="num">Step 04</div><h4>Ask Amira</h4><p>Curious about something? She's one tap away, the whole time.</p></div>
+      <div class="step reveal"><div class="num">Step 01</div><h4>Arrivez ici</h4><p>Vous êtes déjà au bon endroit — cette page est la porte d'entrée.</p></div>
+      <div class="step reveal"><div class="num">Step 02</div><h4>Entrez dans la visite</h4><p>Ouvrez la visionneuse 360° et commencez à parcourir le campus.</p></div>
+      <div class="step reveal"><div class="num">Step 03</div><h4>Explorez</h4><p>Suivez les repères entre les bâtiments, ou rendez-vous directement à un lieu.</p></div>
+      <div class="step reveal"><div class="num">Step 04</div><h4>Demandez à Amira</h4><p>Une question ? Elle est à portée de clic, à tout moment.</p></div>
     </div>
   </div>
 </section>
@@ -689,11 +840,11 @@
 <!-- CTA -->
 <section id="cta">
   <div class="wrap cta-in reveal">
-    <h2 class="h2">Your visit <em>starts now</em></h2>
-    <p>No passport. No flight. No appointment. Just step inside and look around.</p>
+    <h2 class="h2">Votre visite <em>commence maintenant</em></h2>
+    <p>Pas de passeport. Pas de vol. Pas de rendez-vous. Entrez simplement et regardez autour de vous.</p>
     <div class="cta-actions">
-      <a href="#tour" class="btn btn-solid">Enter the tour <span class="arr">→</span></a>
-      <a href="/amira" class="btn btn-ghost" target="_blank">Ask Amira first</a>
+      <a href="#tour" class="btn btn-solid">Commencer la visite <span class="arr">→</span></a>
+      <a href="/amira" class="btn btn-ghost" target="_blank">Demander à Amira d'abord</a>
     </div>
   </div>
 </section>
@@ -704,39 +855,61 @@
     <div class="foot-grid">
       <div>
         <div class="foot-brand">Mundiapolis<em>360</em></div>
-        <p style="max-width:18rem;margin-top:0.8rem;font-size:0.9rem;">A virtual tour of Mundiapolis University, Casablanca.</p>
+        <p style="max-width:18rem;margin-top:0.8rem;font-size:0.9rem;">Une visite virtuelle de l'Université Mundiapolis, Casablanca.</p>
       </div>
       <div class="foot-cols">
         <div class="foot-col">
-          <h5>Explore</h5>
-          <a href="#tour">The Tour</a>
-          <a href="#places">Locations</a>
+          <h5>Explorer</h5>
+          <a href="#tour">La Visite</a>
+          <a href="#places">Les Lieux</a>
           <a href="#guide">Amira</a>
         </div>
         <div class="foot-col">
-          <h5>University</h5>
-          <a href="https://www.mundiapolis.ma" target="_blank">Official Site</a>
-          <a href="#">Programs</a>
-          <a href="#">Admissions</a>
+          <h5>Université</h5>
+          <a href="https://www.mundiapolis.ma" target="_blank" rel="noopener">Site officiel</a>
+          <a href="https://www.mundiapolis.ma/licences-professionnelles-bac3" target="_blank" rel="noopener">Programmes</a>
+          <a href="https://www.mundiapolis.ma/contact" target="_blank" rel="noopener">Admissions</a>
         </div>
         <div class="foot-col">
-          <h5>Visit</h5>
-          <a href="#">Casablanca, Morocco</a>
-          <a href="#">Contact</a>
+          <h5>Visiter</h5>
+          <a href="https://www.google.com/maps/search/?api=1&query=Mundiapolis+380+Bd+Brahim+Roudani+Casablanca" target="_blank" rel="noopener">Casablanca, Maroc</a>
+          <a href="https://www.mundiapolis.ma/contact" target="_blank" rel="noopener">Contact</a>
         </div>
       </div>
     </div>
     <div class="foot-base">
-      <span>© 2026 Mundiapolis University</span>
-      <span>360° navigation by Marzipano</span>
+      <span>© 2026 Université Mundiapolis</span>
+      <span>Navigation 360° par Marzipano</span>
     </div>
   </div>
 </footer>
 
-<!-- FLOATING CHAT -->
-<button class="fab" id="fab" aria-label="Chat with Amira">
+<!-- FLOATING AMIRA -->
+<button class="fab" id="fab" aria-label="Discuter avec Amira">
   <img src="/assets/amira-face.png" alt="Amira" />
 </button>
+
+<!-- FLOATING CHAT PANEL -->
+<div id="amira-panel" class="amira-panel">
+  <div class="ap-head">
+    <div class="ap-avatar" id="ap-avatar"><img src="/assets/amira-face.png" alt="Amira" /></div>
+    <div class="ap-meta">
+      <div class="ap-name">Amira</div>
+      <div class="ap-status" id="ap-status">En ligne · votre guide</div>
+    </div>
+    <button class="ap-close" id="ap-close" aria-label="Fermer">×</button>
+  </div>
+  <div class="ap-body" id="ap-body"></div>
+  <div class="ap-chips" id="ap-chips">
+    <button class="chip" data-q="Quelles filières d'ingénierie proposez-vous ?">Filières ?</button>
+    <button class="chip" data-q="Parle-moi des laboratoires">Les labos ?</button>
+    <button class="chip" data-q="Montre-moi la bibliothèque">Voir la bibliothèque</button>
+  </div>
+  <div class="ap-foot">
+    <input id="ap-input" type="text" placeholder="Écrivez à Amira…" autocomplete="off" />
+    <button id="ap-send" aria-label="Envoyer">➤</button>
+  </div>
+</div>
 
 <script>
   // Scroll reveal
@@ -758,35 +931,280 @@
     });
   }
 
-  // Floating chat → opens Amira page (real chatbot lives there)
-  document.getElementById('fab').addEventListener('click',()=>{ window.open('/amira','_blank'); });
+  // Floating Amira chat panel
+  (function(){
+    const fab     = document.getElementById('fab');
+    const panel   = document.getElementById('amira-panel');
+    const closeBtn= document.getElementById('ap-close');
+    const body    = document.getElementById('ap-body');
+    const chips   = document.getElementById('ap-chips');
+    const input   = document.getElementById('ap-input');
+    const sendBtn = document.getElementById('ap-send');
+    const status  = document.getElementById('ap-status');
+    const avatar  = document.getElementById('ap-avatar');
+    let history = [];
+    let greeted = false;
 
-  // Embedded guide card → posts to real API (works when served by the chatbot server)
-  const gcInput=document.getElementById('gcInput');
-  const gcSend=document.getElementById('gcSend');
-  const gcBody=document.getElementById('gcBody');
-  let gcHistory=[];
-  function gcAppend(t,who){const d=document.createElement('div');d.className='bub '+(who==='a'?'a':'u');d.textContent=t;gcBody.appendChild(d);gcBody.scrollTop=gcBody.scrollHeight;}
-  async function gcSendMsg(){
-    const t=gcInput.value.trim(); if(!t) return;
-    gcAppend(t,'u'); gcInput.value=''; gcSend.disabled=true;
-    try{
-      const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,history:gcHistory})});
-      const {reply}=await r.json();
-      gcAppend(reply,'a');
-      const lang = /[؀-ۿ]/.test(reply) ? 'ar'
-                 : /\b(le|la|je|tu|bonjour|merci)\b/i.test(reply) ? 'fr' : 'en';
-      try {
-        const sr = await fetch('/api/speak',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:reply,language:lang})});
-        if(sr.ok){ const b=await sr.blob(); new Audio(URL.createObjectURL(b)).play().catch(()=>{}); }
-      } catch{}
-      gcHistory.push({role:'user',content:t},{role:'assistant',content:reply});
-      if(gcHistory.length>20)gcHistory=gcHistory.slice(-20);
-    }catch{ gcAppend("I can't connect right now — try the full chat with the button below.",'a'); }
-    finally{ gcSend.disabled=false; gcInput.focus(); }
-  }
-  gcSend.addEventListener('click',gcSendMsg);
-  gcInput.addEventListener('keydown',e=>{if(e.key==='Enter')gcSendMsg();});
+    const SCENE_KEYWORDS = [
+      {rx:/biblioth|library/i,         scene:'32-biblio-1',             label:'Voir la bibliothèque'},
+      {rx:/amphi|conf[ée]rence/i,      scene:'39-salle-de-conference',  label:"Voir l'amphithéâtre"},
+      {rx:/sport|gym|musculation/i,    scene:'41-salle-de-sport-',      label:'Voir le complexe sportif'},
+      {rx:/piscine|pool/i,             scene:'46-salle-de-sport-piscine',label:'Voir la piscine'},
+      {rx:/mosqu[ée]/i,                scene:'37-mosquee',              label:'Voir la mosquée'},
+      {rx:/entr[ée]e|entrance/i,       scene:'34-entree-1',             label:"Voir l'entrée"},
+      {rx:/jardin|garden/i,            scene:'30-terrain-de-foot',      label:'Voir les jardins'},
+      {rx:/caf[ée]t|buvette/i,         scene:'38-buvette-1',            label:'Voir la cafétéria'},
+      {rx:/g[ée]nie|engineering|labo/i,scene:'13-bg-rdc1',              label:'Voir le bâtiment Génie'},
+    ];
+
+    function bubble(text, who){
+      const d=document.createElement('div');
+      d.className='bub '+(who==='a'?'a':'u');
+      d.textContent=text;
+      body.appendChild(d);
+      body.scrollTop=body.scrollHeight;
+      return d;
+    }
+    function addVisit(bubbleEl, reply){
+      for(const k of SCENE_KEYWORDS){
+        if(k.rx.test(reply)){
+          const btn=document.createElement('button');
+          btn.className='visit-btn';btn.innerHTML=k.label+' →';
+          btn.addEventListener('click',function(){
+            closePanel();
+            const ts=document.getElementById('tour');
+            if(ts) ts.scrollIntoView({behavior:'smooth'});
+            const mf=document.getElementById('map-frame');
+            const tf=document.getElementById('tour-frame');
+            const bb=document.getElementById('back-to-map');
+            if(tf){
+              if(mf)mf.style.display='none'; tf.style.display='block'; if(bb)bb.style.display='block';
+              var tLoaded=tf.src&&tf.src!=='about:blank'&&tf.src!=='';
+              if(tLoaded){
+                try{ tf.contentWindow.postMessage({type:'switchScene',sceneId:k.scene},'*'); }
+                catch(err){ tf.src='./tour/index.html#scene='+encodeURIComponent(k.scene); }
+              } else { tf.src='./tour/index.html#scene='+encodeURIComponent(k.scene); }
+            }
+          });
+          bubbleEl.appendChild(document.createElement('br'));
+          bubbleEl.appendChild(btn);
+          break;
+        }
+      }
+    }
+    function showTyping(){const t=document.createElement('div');t.className='typing';t.id='apTyping';t.innerHTML='<span></span><span></span><span></span>';body.appendChild(t);body.scrollTop=body.scrollHeight;}
+    function hideTyping(){const t=document.getElementById('apTyping');if(t)t.remove();}
+    function detectLang(s){if(/[؀-ۿ]/.test(s))return'ar';if(/\b(le|la|les|je|vous|une|des|est|programme|bonjour|merci|campus)\b/i.test(s))return'fr';return'en';}
+
+    async function speak(text){
+      try{
+        const sr=await fetch('/api/speak',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,language:detectLang(text)})});
+        if(sr.ok){const b=await sr.blob();const a=new Audio(URL.createObjectURL(b));avatar.classList.add('speaking');a.onended=()=>avatar.classList.remove('speaking');a.play().catch(()=>avatar.classList.remove('speaking'));}
+      }catch(e){}
+    }
+
+    async function send(txt){
+      const t=(txt||input.value).trim(); if(!t)return;
+      bubble(t,'u'); input.value=''; sendBtn.disabled=true;
+      if(chips)chips.classList.add('hidden');
+      showTyping(); status.textContent='écrit…';
+      try{
+        const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,history:history})});
+        const data=await r.json();
+        const reply=data.reply||"Désolée, je n'ai pas pu répondre.";
+        hideTyping();
+        const b=bubble(reply,'a'); addVisit(b,reply); speak(reply);
+        history.push({role:'user',content:t},{role:'assistant',content:reply});
+        if(history.length>20)history=history.slice(-20);
+      }catch(err){ hideTyping(); bubble("Je ne peux pas me connecter pour l'instant — réessayez plus tard.",'a'); }
+      finally{ sendBtn.disabled=false; status.textContent='En ligne · votre guide'; input.focus(); }
+    }
+
+    function openPanel(){
+      panel.classList.add('open');
+      fab.classList.add('hidden');
+      if(!greeted){
+        greeted=true;
+        showTyping();
+        setTimeout(function(){ hideTyping(); bubble("Bonjour ! Je suis Amira, votre guide sur le campus de Nouaceur 👋 Posez-moi une vraie question — les filières d'ingénierie, les labos, la vie étudiante. Je connais l'endroit.",'a'); },1000);
+      }
+      setTimeout(()=>input.focus(),400);
+    }
+    function closePanel(){
+      panel.classList.remove('open');
+      fab.classList.remove('hidden');
+    }
+
+    fab.addEventListener('click',openPanel);
+    closeBtn.addEventListener('click',closePanel);
+    sendBtn.addEventListener('click',function(){send();});
+    input.addEventListener('keydown',function(e){if(e.key==='Enter')send();});
+    if(chips){chips.querySelectorAll('.chip').forEach(function(c){c.addEventListener('click',function(){send(this.getAttribute('data-q'));});});}
+  })();
+
+  // Embedded guide card — live, immersive, voice-enabled
+  (function(){
+    const gcInput  = document.getElementById('gcInput');
+    const gcSend   = document.getElementById('gcSend');
+    const gcBody   = document.getElementById('gcBody');
+    const gcChips  = document.getElementById('gcChips');
+    const gcStatus = document.getElementById('gc-status');
+    const gcAvatar = document.querySelector('.gc-avatar');
+    let gcHistory = [];
+    let greeted = false;
+
+    // Map keywords in Amira's reply → tour scene IDs (for the "Visiter" button)
+    const SCENE_KEYWORDS = [
+      {rx:/biblioth|library/i,         scene:'32-biblio-1',            label:'Voir la bibliothèque'},
+      {rx:/amphi|conf[ée]rence/i,      scene:'39-salle-de-conference', label:"Voir l'amphithéâtre"},
+      {rx:/sport|gym|musculation/i,    scene:'41-salle-de-sport-',     label:'Voir le complexe sportif'},
+      {rx:/piscine|pool/i,             scene:'46-salle-de-sport-piscine',label:'Voir la piscine'},
+      {rx:/mosqu[ée]/i,                scene:'37-mosquee',             label:'Voir la mosquée'},
+      {rx:/entr[ée]e|entrance/i,       scene:'34-entree-1',            label:"Voir l'entrée"},
+      {rx:/jardin|garden/i,            scene:'30-terrain-de-foot',     label:'Voir les jardins'},
+      {rx:/caf[ée]t|buvette|lounge/i,  scene:'38-buvette-1',           label:'Voir la cafétéria'},
+      {rx:/g[ée]nie|engineering|labo/i,scene:'13-bg-rdc1',             label:'Voir le bâtiment Génie'},
+    ];
+
+    function bubble(text, who){
+      const d = document.createElement('div');
+      d.className = 'bub ' + (who === 'a' ? 'a' : 'u');
+      d.textContent = text;
+      gcBody.appendChild(d);
+      gcBody.scrollTop = gcBody.scrollHeight;
+      return d;
+    }
+
+    function addVisitButton(bubbleEl, reply){
+      for(const k of SCENE_KEYWORDS){
+        if(k.rx.test(reply)){
+          const btn = document.createElement('button');
+          btn.className = 'visit-btn';
+          btn.innerHTML = k.label + ' →';
+          btn.addEventListener('click', function(){
+            const tourSection = document.getElementById('tour');
+            if(tourSection) tourSection.scrollIntoView({behavior:'smooth'});
+            const mapFrame = document.getElementById('map-frame');
+            const tourFrame = document.getElementById('tour-frame');
+            const backBtn = document.getElementById('back-to-map');
+            if(tourFrame){
+              if(mapFrame) mapFrame.style.display='none';
+              tourFrame.style.display='block';
+              if(backBtn) backBtn.style.display='block';
+              var tfLoaded=tourFrame.src&&tourFrame.src!=='about:blank'&&tourFrame.src!=='';
+              if(tfLoaded){
+                try{ tourFrame.contentWindow.postMessage({type:'switchScene',sceneId:k.scene},'*'); }
+                catch(err){ tourFrame.src='./tour/index.html#scene='+encodeURIComponent(k.scene); }
+              } else { tourFrame.src='./tour/index.html#scene='+encodeURIComponent(k.scene); }
+            }
+          });
+          bubbleEl.appendChild(document.createElement('br'));
+          bubbleEl.appendChild(btn);
+          break;
+        }
+      }
+    }
+
+    function showTyping(){
+      const t = document.createElement('div');
+      t.className = 'typing';
+      t.id = 'typingIndic';
+      t.innerHTML = '<span></span><span></span><span></span>';
+      gcBody.appendChild(t);
+      gcBody.scrollTop = gcBody.scrollHeight;
+    }
+    function hideTyping(){
+      const t = document.getElementById('typingIndic');
+      if(t) t.remove();
+    }
+
+    function detectLang(text){
+      if(/[؀-ۿ]/.test(text)) return 'ar';
+      if(/\b(le|la|les|je|vous|une|des|est|programme|bonjour|merci|campus)\b/i.test(text)) return 'fr';
+      return 'en';
+    }
+
+    async function speak(text){
+      try{
+        const lang = detectLang(text);
+        const sr = await fetch('/api/speak',{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({text:text, language:lang})
+        });
+        if(sr.ok){
+          const b = await sr.blob();
+          const audio = new Audio(URL.createObjectURL(b));
+          gcAvatar.classList.add('speaking');
+          audio.onended = ()=> gcAvatar.classList.remove('speaking');
+          audio.play().catch(()=> gcAvatar.classList.remove('speaking'));
+        }
+      }catch(e){ /* silent */ }
+    }
+
+    async function send(userText){
+      const t = (userText || gcInput.value).trim();
+      if(!t) return;
+      bubble(t, 'u');
+      gcInput.value = '';
+      gcSend.disabled = true;
+      if(gcChips) gcChips.classList.add('hidden');
+      showTyping();
+      gcStatus.textContent = 'écrit…';
+
+      try{
+        const r = await fetch('/api/chat',{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({message:t, history:gcHistory})
+        });
+        const data = await r.json();
+        const reply = data.reply || "Désolée, je n'ai pas pu répondre.";
+        hideTyping();
+        const b = bubble(reply, 'a');
+        addVisitButton(b, reply);
+        speak(reply);
+        gcHistory.push({role:'user',content:t},{role:'assistant',content:reply});
+        if(gcHistory.length > 20) gcHistory = gcHistory.slice(-20);
+      }catch(err){
+        hideTyping();
+        bubble("Je ne peux pas me connecter pour l'instant — réessayez via le bouton « Parler à Amira ».", 'a');
+      }finally{
+        gcSend.disabled = false;
+        gcStatus.textContent = 'En ligne · votre guide';
+        gcInput.focus();
+      }
+    }
+
+    // Proactive greeting when the card scrolls into view
+    const guideSection = document.getElementById('guide');
+    if(guideSection){
+      const greetObserver = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting && !greeted){
+            greeted = true;
+            showTyping();
+            setTimeout(function(){
+              hideTyping();
+              bubble("Bonjour ! Je suis Amira 👋 Posez-moi une question, ou choisissez ci-dessous.", 'a');
+            }, 1200);
+            greetObserver.unobserve(e.target);
+          }
+        });
+      },{threshold:0.4});
+      greetObserver.observe(guideSection);
+    }
+
+    // Chip clicks
+    if(gcChips){
+      gcChips.querySelectorAll('.chip').forEach(function(chip){
+        chip.addEventListener('click', function(){
+          send(this.getAttribute('data-q'));
+        });
+      });
+    }
+
+    gcSend.addEventListener('click', function(){ send(); });
+    gcInput.addEventListener('keydown', function(e){ if(e.key==='Enter') send(); });
+  })();
 
   // Place card → jump to specific tour scene
   document.querySelectorAll('.place[data-scene]').forEach(function(card){
@@ -857,10 +1275,16 @@
     window.addEventListener('message', function(e){
       if(e.data && e.data.type === 'mapPinClick' && e.data.sceneId){
         var sceneId = e.data.sceneId;
-        tourFrame.src = './tour/index.html#scene=' + encodeURIComponent(sceneId);
         mapFrame.style.display = 'none';
         tourFrame.style.display = 'block';
         showBackBtn(backBtn);
+        var pinLoaded=tourFrame.src&&tourFrame.src!=='about:blank'&&tourFrame.src!=='';
+        if(pinLoaded){
+          try{ tourFrame.contentWindow.postMessage({type:'switchScene',sceneId:sceneId},'*'); }
+          catch(err){ tourFrame.src='./tour/index.html#scene='+encodeURIComponent(sceneId); }
+        } else {
+          tourFrame.src = './tour/index.html#scene=' + encodeURIComponent(sceneId);
+        }
       }
     });
 
@@ -874,13 +1298,51 @@
     });
   })();
 
-  // Handle fullscreen request from tour iframe
+  // Fullscreen toggle requested from tour iframe
   window.addEventListener('message', function(e){
-    if(e.data && e.data.type === 'requestFullscreen'){
+    if(!e.data) return;
+
+    if(e.data.type === 'toggleFullscreen' || e.data.type === 'requestFullscreen'){
       var stage = document.querySelector('.tour-stage');
-      if(stage && stage.requestFullscreen) stage.requestFullscreen();
+      if(!stage) return;
+
+      if(!document.fullscreenElement && !document.webkitFullscreenElement){
+        if(stage.requestFullscreen) stage.requestFullscreen();
+        else if(stage.webkitRequestFullscreen) stage.webkitRequestFullscreen();
+      } else {
+        if(document.exitFullscreen) document.exitFullscreen();
+        else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+      }
     }
   });
+
+  // Broadcast fullscreen state changes to the tour iframe
+  document.addEventListener('fullscreenchange', broadcastFsState);
+  document.addEventListener('webkitfullscreenchange', broadcastFsState);
+  function broadcastFsState(){
+    var tourFrame = document.getElementById('tour-frame');
+    if(tourFrame && tourFrame.contentWindow){
+      try{
+        tourFrame.contentWindow.postMessage({
+          type: 'fullscreenState',
+          active: !!(document.fullscreenElement || document.webkitFullscreenElement)
+        }, '*');
+      } catch(e){}
+    }
+  }
+
+  // Live Casablanca campus time
+  (function(){
+    var el = document.getElementById('casa-time');
+    if(!el) return;
+    function tick(){
+      try{
+        var t = new Date().toLocaleTimeString('fr-FR',{timeZone:'Africa/Casablanca',hour:'2-digit',minute:'2-digit'});
+        el.textContent = t + ' sur le campus';
+      }catch(e){ el.textContent=''; }
+    }
+    tick(); setInterval(tick, 30000);
+  })();
 
   // Gardens card slideshow
   (function(){
