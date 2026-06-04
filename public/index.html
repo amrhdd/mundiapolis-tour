@@ -278,15 +278,19 @@
     min-height:240px;display:flex;flex-direction:column;justify-content:flex-end;
     text-decoration:none;color:inherit;cursor:pointer;
   }
-  .place.big{grid-column:span 6;min-height:400px;}
-  .place.med{grid-column:span 4;min-height:320px;}
-  .place.sm{grid-column:span 3;min-height:260px;}
-  .place.wide{grid-column:span 8;min-height:300px;}
+  /* 2-3-2-3 aligned grid */
+  .places-grid .place{ grid-column: span 4; min-height: 300px; }
+  .places-grid .place:nth-of-type(1),
+  .places-grid .place:nth-of-type(2),
+  .places-grid .place:nth-of-type(6),
+  .places-grid .place:nth-of-type(7){ grid-column: span 6; min-height: 380px; }
   @media(max-width:860px){
-    .place,.place.big,.place.med,.place.sm,.place.wide{grid-column:span 6;min-height:260px;}
+    .places-grid .place,
+    .places-grid .place:nth-of-type(n){ grid-column: span 6; min-height: 280px; }
   }
   @media(max-width:560px){
-    .place,.place.big,.place.med,.place.sm,.place.wide{grid-column:span 12;min-height:240px;}
+    .places-grid .place,
+    .places-grid .place:nth-of-type(n){ grid-column: span 12; min-height: 250px; }
   }
 
   /* Surface — the photo layer */
@@ -698,38 +702,38 @@
       <p>Du hall d'entrée aux laboratoires NXP et systèmes embarqués — chaque espace du campus de Nouaceur est une étape de la visite. C'est ici qu'on forme les ingénieurs en informatique, en industriel et en systèmes aéronautiques.</p>
     </div>
     <div class="places-grid">
-      <a class="place big reveal" href="#tour" data-scene="34-entree-1">
+      <a class="place reveal" href="#tour" data-scene="34-entree-1">
         <div class="place-surface" data-n="01"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Arrivée</div><h4>Entrée principale</h4></div>
       </a>
-      <a class="place med reveal" href="#tour" data-scene="32-biblio-1">
+      <a class="place reveal" href="#tour" data-scene="32-biblio-1">
         <div class="place-surface" data-n="02"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Études</div><h4>Bibliothèque centrale</h4></div>
       </a>
-      <a class="place sm reveal" href="#tour" data-scene="0-labo-electronique">
+      <a class="place reveal" href="#tour" data-scene="0-labo-electronique">
         <div class="place-surface" data-n="03"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Faculté</div><h4>Ingénierie</h4></div>
       </a>
-      <a class="place med reveal" href="#tour" data-scene="41-salle-de-sport-">
+      <a class="place reveal" href="#tour" data-scene="41-salle-de-sport-">
         <div class="place-surface" data-n="04"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Sport</div><h4>Complexe sportif</h4></div>
       </a>
-      <a class="place sm reveal" href="#tour" data-scene="38-buvette-1">
+      <a class="place reveal" href="#tour" data-scene="38-buvette-1">
         <div class="place-surface" data-n="05"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Vie sociale</div><h4>Espace étudiant</h4></div>
       </a>
-      <a class="place wide reveal" href="#tour" data-scene="39-salle-de-conference">
+      <a class="place reveal" href="#tour" data-scene="39-salle-de-conference">
         <div class="place-surface" data-n="06"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Événements</div><h4>L'Amphithéâtre</h4></div>
       </a>
       <!-- Gardens card with slideshow — 3 stacked surfaces, JS cycles them -->
-      <a class="place med reveal place-slideshow" href="#tour" data-scene="30-terrain-de-foot" id="gardens-card">
+      <a class="place reveal place-slideshow" href="#tour" data-scene="30-terrain-de-foot" id="gardens-card">
         <div class="place-surface slide active" data-bg="/assets/photos/gardens-1.jpg"></div>
         <div class="place-surface slide" data-bg="/assets/photos/gardens-2.jpg"></div>
         <div class="place-surface slide" data-bg="/assets/photos/gardens-3.jpg"></div>
@@ -741,47 +745,22 @@
           <span class="sdot"></span>
         </div>
       </a>
-      <a class="place sm reveal" href="#tour" data-scene="46-salle-de-sport-piscine">
+      <a class="place reveal" href="#tour" data-scene="46-salle-de-sport-piscine">
         <div class="place-surface" data-n="08"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Bien-être</div><h4>Piscine</h4></div>
       </a>
-      <a class="place sm reveal" href="#tour" data-scene="43-salle-de-sport-musculation">
+      <a class="place reveal" href="#tour" data-scene="43-salle-de-sport-musculation">
         <div class="place-surface" data-n="09"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Fitness</div><h4>Salle de musculation</h4></div>
       </a>
-      <a class="place sm reveal" href="#tour" data-scene="37-mosquee">
+      <a class="place reveal" href="#tour" data-scene="37-mosquee">
         <div class="place-surface" data-n="10"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Spiritualité</div><h4>Mosquée</h4></div>
       </a>
     </div>
-  </div>
-</section>
-
-<!-- STUDENT VOICES -->
-<section id="voices" style="padding:clamp(6rem,12vh,9rem) 0;background:var(--paper-2);">
-  <div class="wrap">
-    <div class="reveal" style="max-width:40rem;margin-bottom:3rem;">
-      <div class="eyebrow">Celles et ceux qui y sont</div>
-      <h2 class="h2">Le campus, <em>dans leurs mots</em></h2>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;">
-      <blockquote class="reveal" style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1.8rem;margin:0;">
-        <p style="font-family:var(--serif);font-style:italic;font-size:1.1rem;line-height:1.5;color:var(--ink);margin-bottom:1.2rem;">« J'ai raté mon premier TP au labo d'électronique. Je suis revenu le lendemain — le prof était encore là. C'est là que j'ai compris où j'avais atterri. »</p>
-        <footer style="font-size:0.85rem;color:var(--muted);">Yassine · 2ᵉ année prépa, Génie Informatique</footer>
-      </blockquote>
-      <blockquote class="reveal" style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1.8rem;margin:0;">
-        <p style="font-family:var(--serif);font-style:italic;font-size:1.1rem;line-height:1.5;color:var(--ink);margin-bottom:1.2rem;">« La visite chez Royal Air Maroc, le labo systèmes embarqués… être à Nouaceur, à côté de l'aéroport, ça donne du sens au génie aéronautique. »</p>
-        <footer style="font-size:0.85rem;color:var(--muted);">Salma · Génie des Systèmes Aéronautiques</footer>
-      </blockquote>
-      <blockquote class="reveal" style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1.8rem;margin:0;">
-        <p style="font-family:var(--serif);font-style:italic;font-size:1.1rem;line-height:1.5;color:var(--ink);margin-bottom:1.2rem;">« Ici on apprend par projet, pas par cœur. Mon premier vrai projet a démarré dès la première année — et la finale Inter-Class, c'est sacré. »</p>
-        <footer style="font-size:0.85rem;color:var(--muted);">Mehdi · Génie Industriel</footer>
-      </blockquote>
-    </div>
-    <p style="font-size:0.75rem;color:var(--muted);margin-top:1.5rem;font-style:italic;">Témoignages représentatifs de la vie étudiante au campus de Nouaceur.</p>
   </div>
 </section>
 
