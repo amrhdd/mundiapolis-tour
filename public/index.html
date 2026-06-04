@@ -269,28 +269,38 @@
   .places-head{margin-bottom:3rem;max-width:40rem;}
   .places-head p{color:var(--muted);margin-top:1rem;}
   .places-grid{
-    display:grid;grid-template-columns:repeat(12,1fr);gap:1.2rem;
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:16px;
   }
   /* ── Place cards ── */
   .place{
-    position:relative;border-radius:6px;overflow:hidden;
+    position:relative;border-radius:10px;overflow:hidden;
     background:var(--paper-2);border:1px solid var(--line);
-    min-height:240px;display:flex;flex-direction:column;justify-content:flex-end;
+    min-height:300px;display:flex;flex-direction:column;justify-content:flex-end;
     text-decoration:none;color:inherit;cursor:pointer;
+    grid-column:span 2;
   }
-  /* 2-3-2-3 aligned grid */
-  .places-grid .place{ grid-column: span 4; min-height: 300px; }
+  /* feature row: first two cards 2-up and taller */
   .places-grid .place:nth-of-type(1),
-  .places-grid .place:nth-of-type(2),
-  .places-grid .place:nth-of-type(6),
-  .places-grid .place:nth-of-type(7){ grid-column: span 6; min-height: 380px; }
-  @media(max-width:860px){
-    .places-grid .place,
-    .places-grid .place:nth-of-type(n){ grid-column: span 6; min-height: 280px; }
+  .places-grid .place:nth-of-type(2){ grid-column:span 3; min-height:360px; }
+  .places-grid .place .place-surface{ transition:transform .9s cubic-bezier(.16,1,.3,1); }
+  .places-grid .place:hover .place-surface{ transform:scale(1.06); }
+  .places-grid .place::after{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(to top,rgba(8,6,4,.72) 0%,rgba(8,6,4,.15) 48%,transparent 78%);
+    z-index:1;
   }
-  @media(max-width:560px){
+  .places-grid .place .place-tag{ z-index:2; }
+  @media(max-width:860px){
+    .places-grid{ grid-template-columns:repeat(2,1fr); }
     .places-grid .place,
-    .places-grid .place:nth-of-type(n){ grid-column: span 12; min-height: 250px; }
+    .places-grid .place:nth-of-type(n){ grid-column:span 1; min-height:240px; }
+  }
+  @media(max-width:520px){
+    .places-grid{ grid-template-columns:1fr; }
+    .places-grid .place,
+    .places-grid .place:nth-of-type(n){ grid-column:span 1; min-height:230px; }
   }
 
   /* Surface — the photo layer */
@@ -318,8 +328,7 @@
   /* Photo mapping — 10 cards */
   .places-grid .place:nth-of-type(1)  .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/entrance.jpg'); }
   .places-grid .place:nth-of-type(2)  .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/library.jpg'); }
-  .places-grid .place:nth-of-type(3)  .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/engineering.jpg'); }
-  .places-grid .place:nth-of-type(4)  .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/sports-complex.jpg'); }
+.places-grid .place:nth-of-type(4)  .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/sports-complex.jpg'); }
   .places-grid .place:nth-of-type(5)  .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/lounge.jpg'); }
   .places-grid .place:nth-of-type(6)  .place-surface:not(.slide){ background-image:linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%),url('/assets/photos/amphitheater.jpg'); }
   /* Gardens card: slides have bg set via JS from data-bg */
@@ -712,10 +721,15 @@
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Études</div><h4>Bibliothèque centrale</h4></div>
       </a>
-      <a class="place reveal" href="#tour" data-scene="0-labo-electronique">
-        <div class="place-surface" data-n="03"></div>
+      <a class="place reveal place-slideshow" href="#tour" data-scene="0-labo-electronique" id="eng-card">
+        <div class="place-surface slide active" data-bg="/assets/photos/engineering-1.jpg"></div>
+        <div class="place-surface slide" data-bg="/assets/photos/engineering-2.jpg"></div>
+        <div class="place-surface slide" data-bg="/assets/photos/engineering-3.jpg"></div>
         <div class="go">↗</div>
         <div class="place-tag"><div class="cat">Faculté</div><h4>Ingénierie</h4></div>
+        <div class="slide-dots">
+          <span class="sdot active"></span><span class="sdot"></span><span class="sdot"></span>
+        </div>
       </a>
       <a class="place reveal" href="#tour" data-scene="41-salle-de-sport-">
         <div class="place-surface" data-n="04"></div>
@@ -1323,32 +1337,26 @@
     tick(); setInterval(tick, 30000);
   })();
 
-  // Gardens card slideshow
-  (function(){
-    const card = document.getElementById('gardens-card');
+  // Slideshow cards (gardens + engineering labs)
+  ['gardens-card','eng-card'].forEach(function(id){
+    var card = document.getElementById(id);
     if(!card) return;
-    const slides = card.querySelectorAll('.place-surface.slide');
-    const dots = card.querySelectorAll('.sdot');
-    const overlay = 'linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%)';
-
-    // Set backgrounds from data-bg
-    slides.forEach(s => {
-      const bg = s.getAttribute('data-bg');
+    var slides = card.querySelectorAll('.place-surface.slide');
+    var dots   = card.querySelectorAll('.sdot');
+    var overlay = 'linear-gradient(to top,rgba(8,6,4,0.78) 0%,rgba(8,6,4,0.1) 55%,transparent 100%)';
+    slides.forEach(function(s){
+      var bg = s.getAttribute('data-bg');
       if(bg) s.style.backgroundImage = overlay + ',url(' + bg + ')';
       s.style.backgroundSize = 'cover';
-      s.style.backgroundPosition = 'center 30%';
+      s.style.backgroundPosition = 'center 35%';
     });
-
-    let cur = 0;
-    function next(){
-      slides[cur].classList.remove('active');
-      dots[cur].classList.remove('active');
+    var cur = 0;
+    setInterval(function(){
+      slides[cur].classList.remove('active'); if(dots[cur]) dots[cur].classList.remove('active');
       cur = (cur + 1) % slides.length;
-      slides[cur].classList.add('active');
-      dots[cur].classList.add('active');
-    }
-    setInterval(next, 3500);
-  })();
+      slides[cur].classList.add('active'); if(dots[cur]) dots[cur].classList.add('active');
+    }, 3500);
+  });
 
 
 </script>
