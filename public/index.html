@@ -558,6 +558,8 @@
   .ap-meta{flex:1;min-width:0;}
   .ap-close{background:none;border:none;color:rgba(244,237,226,0.5);font-size:1.5rem;cursor:pointer;line-height:1;transition:color .3s;}
   .ap-close:hover{color:var(--paper);}
+  .ap-voice{background:none;border:none;color:rgba(244,237,226,0.4);font-size:1rem;cursor:pointer;line-height:1;padding:0 2px;transition:color .3s;}
+  .ap-voice:hover{color:var(--paper);}
 
   .ap-body{
     flex:1;overflow-y:auto;padding:1.2rem;
@@ -796,6 +798,7 @@
       <div class="gc-head">
         <div class="gc-avatar"><img src="/assets/amira-face.png" alt="Amira" /></div>
         <div><div class="nm">Amira</div><div class="st" id="gc-status">En ligne · votre guide</div></div>
+        <button id="gc-voice" aria-label="Activer la voix" title="Activer/désactiver la voix" style="margin-left:auto;background:none;border:none;color:rgba(244,237,226,0.4);font-size:1rem;cursor:pointer;padding:0 2px;transition:color .3s;">🔇</button>
       </div>
       <div class="gc-body" id="gcBody">
         <!-- messages injected by JS -->
@@ -822,10 +825,10 @@
       <h2 class="h2">Quatre étapes</h2>
     </div>
     <div class="proc-grid">
-      <div class="step reveal"><div class="num">Step 01</div><h4>Arrivez ici</h4><p>Vous êtes déjà au bon endroit — cette page est la porte d'entrée.</p></div>
-      <div class="step reveal"><div class="num">Step 02</div><h4>Entrez dans la visite</h4><p>Ouvrez la visionneuse 360° et commencez à parcourir le campus.</p></div>
-      <div class="step reveal"><div class="num">Step 03</div><h4>Explorez</h4><p>Suivez les repères entre les bâtiments, ou rendez-vous directement à un lieu.</p></div>
-      <div class="step reveal"><div class="num">Step 04</div><h4>Demandez à Amira</h4><p>Une question ? Elle est à portée de clic, à tout moment.</p></div>
+      <div class="step reveal"><div class="num">Étape 01</div><h4>Arrivez ici</h4><p>Vous êtes déjà au bon endroit — cette page est la porte d'entrée.</p></div>
+      <div class="step reveal"><div class="num">Étape 02</div><h4>Entrez dans la visite</h4><p>Ouvrez la visionneuse 360° et commencez à parcourir le campus.</p></div>
+      <div class="step reveal"><div class="num">Étape 03</div><h4>Explorez</h4><p>Suivez les repères entre les bâtiments, ou rendez-vous directement à un lieu.</p></div>
+      <div class="step reveal"><div class="num">Étape 04</div><h4>Demandez à Amira</h4><p>Une question ? Elle est à portée de clic, à tout moment.</p></div>
     </div>
   </div>
 </section>
@@ -890,6 +893,7 @@
       <div class="ap-name">Amira</div>
       <div class="ap-status" id="ap-status">En ligne · votre guide</div>
     </div>
+    <button class="ap-voice" id="ap-voice" aria-label="Activer la voix" title="Activer/désactiver la voix">🔇</button>
     <button class="ap-close" id="ap-close" aria-label="Fermer">×</button>
   </div>
   <div class="ap-body" id="ap-body"></div>
@@ -935,8 +939,18 @@
     const sendBtn = document.getElementById('ap-send');
     const status  = document.getElementById('ap-status');
     const avatar  = document.getElementById('ap-avatar');
+    const voiceBtn = document.getElementById('ap-voice');
     let history = [];
     let greeted = false;
+    let apVoiceEnabled = false;
+
+    if(voiceBtn){
+      voiceBtn.addEventListener('click',function(){
+        apVoiceEnabled = !apVoiceEnabled;
+        voiceBtn.textContent = apVoiceEnabled ? '🔊' : '🔇';
+        voiceBtn.setAttribute('aria-label', apVoiceEnabled ? 'Couper le son' : 'Activer la voix');
+      });
+    }
 
     const SCENE_KEYWORDS = [
       {rx:/biblioth|library/i,         scene:'32-biblio-1',             label:'Voir la bibliothèque'},
@@ -949,6 +963,20 @@
       {rx:/caf[ée]t|buvette/i,         scene:'38-buvette-1',            label:'Voir la cafétéria'},
       {rx:/g[ée]nie|engineering|labo/i,scene:'13-bg-rdc1',              label:'Voir le bâtiment Génie'},
     ];
+    const SCENE_LABELS = {
+      '34-entree-1':"Voir l'entrée principale",'36-entree-2':"Voir l'entrée du campus",
+      '32-biblio-1':'Voir la bibliothèque','33-biblio-2':'Voir la salle de lecture',
+      '0-labo-electronique':"Voir le labo d'électronique",'4-labo-electicite':"Voir le labo d'électricité",
+      '3-labo-optique':'Voir le labo optique','7-labo-chimique':'Voir le labo de chimie',
+      '13-bg-rdc1':'Voir le bâtiment Génie','18-bm-rdc2':'Voir le bâtiment Management',
+      '12-administration':"Voir l'administration",'39-salle-de-conference':"Voir l'amphithéâtre",
+      '38-buvette-1':'Voir la cafétéria','40-buvette-2':"Voir l'espace restauration",
+      '37-mosquee':'Voir la mosquée','41-salle-de-sport-':'Voir le complexe sportif',
+      '43-salle-de-sport-musculation':'Voir la salle de musculation',
+      '46-salle-de-sport-piscine':'Voir la piscine',
+      '30-terrain-de-foot':'Voir le terrain / jardins',
+      '26-cite-universitaire-l-internat':"Voir la cité universitaire",
+    };
 
     function bubble(text, who){
       const d=document.createElement('div');
@@ -958,27 +986,36 @@
       body.scrollTop=body.scrollHeight;
       return d;
     }
+    function jumpToScene(sceneId){
+      closePanel();
+      const ts=document.getElementById('tour');
+      if(ts) ts.scrollIntoView({behavior:'smooth'});
+      const mf=document.getElementById('map-frame');
+      const tf=document.getElementById('tour-frame');
+      const bb=document.getElementById('back-to-map');
+      if(tf){
+        if(mf)mf.style.display='none'; tf.style.display='block'; if(bb)bb.style.display='block';
+        var tLoaded=tf.src&&tf.src!=='about:blank'&&tf.src!=='';
+        if(tLoaded){
+          try{ tf.contentWindow.postMessage({type:'switchScene',sceneId:sceneId},'*'); }
+          catch(e){ tf.src='./tour/index.html#scene='+encodeURIComponent(sceneId); }
+        } else { tf.src='./tour/index.html#scene='+encodeURIComponent(sceneId); }
+      }
+    }
+    function addVisitFromScene(bubbleEl, sceneId){
+      const label = SCENE_LABELS[sceneId] || "Voir l'endroit";
+      const btn=document.createElement('button');
+      btn.className='visit-btn'; btn.innerHTML=label+' →';
+      btn.addEventListener('click',function(){ jumpToScene(sceneId); });
+      bubbleEl.appendChild(document.createElement('br'));
+      bubbleEl.appendChild(btn);
+    }
     function addVisit(bubbleEl, reply){
       for(const k of SCENE_KEYWORDS){
         if(k.rx.test(reply)){
           const btn=document.createElement('button');
           btn.className='visit-btn';btn.innerHTML=k.label+' →';
-          btn.addEventListener('click',function(){
-            closePanel();
-            const ts=document.getElementById('tour');
-            if(ts) ts.scrollIntoView({behavior:'smooth'});
-            const mf=document.getElementById('map-frame');
-            const tf=document.getElementById('tour-frame');
-            const bb=document.getElementById('back-to-map');
-            if(tf){
-              if(mf)mf.style.display='none'; tf.style.display='block'; if(bb)bb.style.display='block';
-              var tLoaded=tf.src&&tf.src!=='about:blank'&&tf.src!=='';
-              if(tLoaded){
-                try{ tf.contentWindow.postMessage({type:'switchScene',sceneId:k.scene},'*'); }
-                catch(err){ tf.src='./tour/index.html#scene='+encodeURIComponent(k.scene); }
-              } else { tf.src='./tour/index.html#scene='+encodeURIComponent(k.scene); }
-            }
-          });
+          btn.addEventListener('click',function(){ jumpToScene(k.scene); });
           bubbleEl.appendChild(document.createElement('br'));
           bubbleEl.appendChild(btn);
           break;
@@ -1006,7 +1043,9 @@
         const data=await r.json();
         const reply=data.reply||"Désolée, je n'ai pas pu répondre.";
         hideTyping();
-        const b=bubble(reply,'a'); addVisit(b,reply); speak(reply);
+        const b=bubble(reply,'a');
+        if(data.scene) addVisitFromScene(b,data.scene); else addVisit(b,reply);
+        if(apVoiceEnabled) speak(reply.replace(/\n\(Source\s*:[^)]*\)$/,'').trim());
         history.push({role:'user',content:t},{role:'assistant',content:reply});
         if(history.length>20)history=history.slice(-20);
       }catch(err){ hideTyping(); bubble("Je ne peux pas me connecter pour l'instant — réessayez plus tard.",'a'); }
@@ -1019,7 +1058,7 @@
       if(!greeted){
         greeted=true;
         showTyping();
-        setTimeout(function(){ hideTyping(); bubble("Bonjour ! Je suis Amira, votre guide sur le campus de Nouaceur 👋 Posez-moi une vraie question — les filières d'ingénierie, les labos, la vie étudiante. Je connais l'endroit.",'a'); },1000);
+        setTimeout(function(){ hideTyping(); const greet="Bonjour ! Je suis Amira, votre guide sur le campus de Nouaceur 👋 Posez-moi une vraie question — les filières d'ingénierie, les labos, la vie étudiante. Je connais l'endroit."; bubble(greet,'a'); if(apVoiceEnabled) speak(greet); },1000);
       }
       setTimeout(()=>input.focus(),400);
     }
@@ -1043,8 +1082,18 @@
     const gcChips  = document.getElementById('gcChips');
     const gcStatus = document.getElementById('gc-status');
     const gcAvatar = document.querySelector('.gc-avatar');
+    const gcVoiceBtn = document.getElementById('gc-voice');
     let gcHistory = [];
     let greeted = false;
+    let gcVoiceEnabled = false;
+
+    if(gcVoiceBtn){
+      gcVoiceBtn.addEventListener('click',function(){
+        gcVoiceEnabled = !gcVoiceEnabled;
+        gcVoiceBtn.textContent = gcVoiceEnabled ? '🔊' : '🔇';
+        gcVoiceBtn.setAttribute('aria-label', gcVoiceEnabled ? 'Couper le son' : 'Activer la voix');
+      });
+    }
 
     // Map keywords in Amira's reply → tour scene IDs (for the "Visiter" button)
     const SCENE_KEYWORDS = [
@@ -1058,6 +1107,45 @@
       {rx:/caf[ée]t|buvette|lounge/i,  scene:'38-buvette-1',           label:'Voir la cafétéria'},
       {rx:/g[ée]nie|engineering|labo/i,scene:'13-bg-rdc1',             label:'Voir le bâtiment Génie'},
     ];
+    const SCENE_LABELS = {
+      '34-entree-1':"Voir l'entrée principale",'36-entree-2':"Voir l'entrée du campus",
+      '32-biblio-1':'Voir la bibliothèque','33-biblio-2':'Voir la salle de lecture',
+      '0-labo-electronique':"Voir le labo d'électronique",'4-labo-electicite':"Voir le labo d'électricité",
+      '3-labo-optique':'Voir le labo optique','7-labo-chimique':'Voir le labo de chimie',
+      '13-bg-rdc1':'Voir le bâtiment Génie','18-bm-rdc2':'Voir le bâtiment Management',
+      '12-administration':"Voir l'administration",'39-salle-de-conference':"Voir l'amphithéâtre",
+      '38-buvette-1':'Voir la cafétéria','40-buvette-2':"Voir l'espace restauration",
+      '37-mosquee':'Voir la mosquée','41-salle-de-sport-':'Voir le complexe sportif',
+      '43-salle-de-sport-musculation':'Voir la salle de musculation',
+      '46-salle-de-sport-piscine':'Voir la piscine',
+      '30-terrain-de-foot':'Voir le terrain / jardins',
+      '26-cite-universitaire-l-internat':"Voir la cité universitaire",
+    };
+    function jumpToSceneGC(sceneId){
+      const tourSection = document.getElementById('tour');
+      if(tourSection) tourSection.scrollIntoView({behavior:'smooth'});
+      const mapFrame = document.getElementById('map-frame');
+      const tourFrame = document.getElementById('tour-frame');
+      const backBtn = document.getElementById('back-to-map');
+      if(tourFrame){
+        if(mapFrame) mapFrame.style.display='none';
+        tourFrame.style.display='block';
+        if(backBtn) backBtn.style.display='block';
+        var tfLoaded=tourFrame.src&&tourFrame.src!=='about:blank'&&tourFrame.src!=='';
+        if(tfLoaded){
+          try{ tourFrame.contentWindow.postMessage({type:'switchScene',sceneId:sceneId},'*'); }
+          catch(err){ tourFrame.src='./tour/index.html#scene='+encodeURIComponent(sceneId); }
+        } else { tourFrame.src='./tour/index.html#scene='+encodeURIComponent(sceneId); }
+      }
+    }
+    function addVisitFromScene(bubbleEl, sceneId){
+      const label = SCENE_LABELS[sceneId] || "Voir l'endroit";
+      const btn = document.createElement('button');
+      btn.className = 'visit-btn'; btn.innerHTML = label + ' →';
+      btn.addEventListener('click', function(){ jumpToSceneGC(sceneId); });
+      bubbleEl.appendChild(document.createElement('br'));
+      bubbleEl.appendChild(btn);
+    }
 
     function bubble(text, who){
       const d = document.createElement('div');
@@ -1074,23 +1162,7 @@
           const btn = document.createElement('button');
           btn.className = 'visit-btn';
           btn.innerHTML = k.label + ' →';
-          btn.addEventListener('click', function(){
-            const tourSection = document.getElementById('tour');
-            if(tourSection) tourSection.scrollIntoView({behavior:'smooth'});
-            const mapFrame = document.getElementById('map-frame');
-            const tourFrame = document.getElementById('tour-frame');
-            const backBtn = document.getElementById('back-to-map');
-            if(tourFrame){
-              if(mapFrame) mapFrame.style.display='none';
-              tourFrame.style.display='block';
-              if(backBtn) backBtn.style.display='block';
-              var tfLoaded=tourFrame.src&&tourFrame.src!=='about:blank'&&tourFrame.src!=='';
-              if(tfLoaded){
-                try{ tourFrame.contentWindow.postMessage({type:'switchScene',sceneId:k.scene},'*'); }
-                catch(err){ tourFrame.src='./tour/index.html#scene='+encodeURIComponent(k.scene); }
-              } else { tourFrame.src='./tour/index.html#scene='+encodeURIComponent(k.scene); }
-            }
-          });
+          btn.addEventListener('click', function(){ jumpToSceneGC(k.scene); });
           bubbleEl.appendChild(document.createElement('br'));
           bubbleEl.appendChild(btn);
           break;
@@ -1153,8 +1225,8 @@
         const reply = data.reply || "Désolée, je n'ai pas pu répondre.";
         hideTyping();
         const b = bubble(reply, 'a');
-        addVisitButton(b, reply);
-        speak(reply);
+        if(data.scene) addVisitFromScene(b, data.scene); else addVisitButton(b, reply);
+        if(gcVoiceEnabled) speak(reply.replace(/\n\(Source\s*:[^)]*\)$/,'').trim());
         gcHistory.push({role:'user',content:t},{role:'assistant',content:reply});
         if(gcHistory.length > 20) gcHistory = gcHistory.slice(-20);
       }catch(err){
@@ -1177,7 +1249,9 @@
             showTyping();
             setTimeout(function(){
               hideTyping();
-              bubble("Bonjour ! Je suis Amira 👋 Posez-moi une question, ou choisissez ci-dessous.", 'a');
+              const greet = "Bonjour ! Je suis Amira 👋 Posez-moi une question, ou choisissez ci-dessous.";
+              bubble(greet, 'a');
+              if(gcVoiceEnabled) speak(greet);
             }, 1200);
             greetObserver.unobserve(e.target);
           }

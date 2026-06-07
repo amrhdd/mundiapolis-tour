@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Amira — Your Mundiapolis Guide</title>
+  <title>Amira — Votre guide Mundiapolis</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..700&family=Spline+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -18,19 +18,19 @@
   </script>
 </head>
 <body>
-  <a href="/" class="amira-back" aria-label="Back to site"><span>&larr;</span> Back to site</a>
+  <a href="/" class="amira-back" aria-label="Retour au site"><span>&larr;</span> Retour au site</a>
 
   <div class="amira-shell">
 
     <!-- LEFT: editorial copy -->
     <div class="amira-copy">
-      <div class="eyebrow">Mundiapolis University · Casablanca</div>
-      <h1 class="amira-title">Your guide,<br><em>Amira</em></h1>
-      <p class="amira-lead">She talks like a student who actually goes here — ask her about programs, admissions, or what the library's like during exams. English, French, or Arabic.</p>
+      <div class="eyebrow">Université Mundiapolis · Casablanca</div>
+      <h1 class="amira-title">Votre guide,<br><em>Amira</em></h1>
+      <p class="amira-lead">Elle parle comme une étudiante qui fréquente vraiment le campus — interroge-la sur les programmes, les admissions, ou l'ambiance de la bibliothèque en période d'examens. En français, anglais ou arabe.</p>
       <ul class="amira-list">
-        <li><span class="n">01</span><span>Programs &amp; Admissions</span></li>
-        <li><span class="n">02</span><span>Campus &amp; Facilities</span></li>
-        <li><span class="n">03</span><span>Student Life</span></li>
+        <li><span class="n">01</span><span>Programmes &amp; Admissions</span></li>
+        <li><span class="n">02</span><span>Campus &amp; Installations</span></li>
+        <li><span class="n">03</span><span>Vie étudiante</span></li>
       </ul>
     </div>
 
@@ -40,32 +40,32 @@
         <div class="avatar-circle" id="avatar-header-mount"></div>
         <div class="head-info">
           <div class="nm">Amira</div>
-          <div class="st">Online</div>
+          <div class="st">En ligne</div>
         </div>
-        <button id="voice-toggle" class="voice-toggle" title="Mute voice">🔊</button>
+        <button id="voice-toggle" class="voice-toggle" title="Couper le son" aria-label="Couper le son">🔊</button>
       </div>
 
       <div class="messages" id="messages">
         <div class="msg bot">
           <div class="msg-bubble">
-            Hi! I'm Amira 👋 I'm here to help you discover Mundiapolis. What would you like to know?
+            Bonjour ! Je suis Amira 👋 Je suis là pour te faire découvrir Mundiapolis. Qu'est-ce que tu veux savoir ?
           </div>
         </div>
       </div>
 
       <div class="presets" id="presets">
-        <button class="preset-btn">Tell me about Mundiapolis</button>
-        <button class="preset-btn">What programs do you offer?</button>
-        <button class="preset-btn">How do I apply?</button>
-        <button class="preset-btn">Tell me about campus life</button>
+        <button class="preset-btn">Parle-moi de Mundiapolis</button>
+        <button class="preset-btn">Quels programmes proposez-vous ?</button>
+        <button class="preset-btn">Comment m'inscrire ?</button>
+        <button class="preset-btn">Parle-moi de la vie étudiante</button>
       </div>
 
       <div class="input-area">
-        <input type="text" id="user-input" placeholder="Ask Amira anything…" autocomplete="off" maxlength="2000">
-        <button id="mic-btn" title="Voice input">
+        <input type="text" id="user-input" placeholder="Pose-moi une question…" autocomplete="off" maxlength="2000">
+        <button id="mic-btn" title="Entrée vocale" aria-label="Entrée vocale">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
         </button>
-        <button id="send-btn" title="Send">
+        <button id="send-btn" title="Envoyer" aria-label="Envoyer">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         </button>
       </div>
