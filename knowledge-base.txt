@@ -26,22 +26,16 @@ MUNDIAPOLIS UNIVERSITY — VERIFIED FACTS (April 2026)
 ## SCHOOLS & PROGRAMS (5 main poles)
 1. Business School
    - Management, Marketing, Finance, Entrepreneurship
-
-2. École d'Ingénierie — CAMPUS DE NOUACEUR (this virtual tour)
-   FR: Trois filières d'ingénieur — Informatique (Génie Informatique), Génie Industriel,
-       Systèmes Aéronautiques — plus des Licences en Informatique et en Aéronautique.
-       Cursus ingénieur en 2+3 : deux ans de prépa intégrée puis trois ans de cycle ingénieur.
-   EN: Three engineering tracks — Computer Science (Génie Informatique), Industrial
-       Engineering, Aeronautical Systems — plus Bachelor's degrees in Computer Science
-       and Aeronautics. Engineer path is 2+3: two years of integrated prépa, then three
-       years of the engineering cycle.
-
+   
+2. École d'Ingénieurs (Engineering School)
+   - Computer Engineering, Civil Engineering, Industrial Engineering
+   
 3. Institut des Sciences Politiques, Juridiques et Sociales
    - Law, Political Science, Social Sciences
-
+   
 4. Faculté des Sciences de la Santé (Health Sciences)
    - Health-related programs
-
+   
 5. Formation Executive (Executive Education)
    - Professional/continuing education programs
    - Includes 1 DBA (Doctorat in Business Administration)
@@ -51,16 +45,10 @@ MUNDIAPOLIS UNIVERSITY — VERIFIED FACTS (April 2026)
 - 14 continuing education programs
 
 ## ADMISSIONS PROCESS
-### Engineering (École d'Ingénierie — Nouaceur campus):
-   FR: Accessible avec un Bac scientifique ou technique, sur dossier et entretien.
-       Pour postuler ou en savoir plus : https://www.mundiapolis.ma/contact
-   EN: Open to students with a scientific or technical Bac, via application file and
-       interview. To apply or learn more: https://www.mundiapolis.ma/contact
-
-### For 1st year (Bac+0) — all schools:
+### For 1st year (Bac+0):
 - Must hold Moroccan or foreign Baccalauréat
 - Process: File review + oral interview with admissions jury
-- Contact admissions: admissions@mundiapolis.ma / 00 212 529 01 37 07
+- Contact admissions to schedule appointment
 
 ### For 2nd or 3rd year (Bac+1 or Bac+2):
 - Must hold BAC+1 or BAC+2
@@ -87,40 +75,6 @@ MUNDIAPOLIS UNIVERSITY — VERIFIED FACTS (April 2026)
 - Modern academic environment
 - Open house events regularly organized (Journées Portes Ouvertes)
   - Recent: April 11, 2026 (10h-13h) and March 17, 2026 (10h30-15h30)
-
-## CAMPUS LOCATIONS (Nouaceur — all scenes in the virtual tour)
-
-BIBLIOTHÈQUE / LIBRARY (scene 32-biblio-1)
-  FR: Un espace d'étude ouvert aux étudiants — l'endroit calme où l'on révise, surtout en période d'examens. (Pour les horaires précis, voir avec l'administration.)
-  EN: A study space open to students — the quiet spot for revising, especially during exams. (For exact hours, check with administration.)
-
-LABORATOIRES / LABS (scene 0-labo-electronique)
-  FR: Les laboratoires d'électronique et de systèmes embarqués, dont le labo NXP, où les étudiants manipulent du vrai matériel et donnent vie à leurs projets.
-  EN: The electronics and embedded-systems labs, including the NXP lab, where students get hands-on with real hardware and bring their projects to life.
-
-AMPHITHÉÂTRE / AMPHITHEATER (scene 39-salle-de-conference)
-  FR: Le grand amphithéâtre accueille les conférences et les événements du campus.
-  EN: The large amphitheater hosts the campus's conferences and events.
-
-COMPLEXE SPORTIF / SPORTS COMPLEX (scene 41-salle-de-sport-)
-  FR: Un complexe sur deux niveaux : la piscine en bas (scene 46-salle-de-sport-piscine) ; en haut, la salle de musculation (scene 43-salle-de-sport-musculation) et la salle de sport avec terrains intérieurs de volley et de basket.
-  EN: A two-level complex: the pool downstairs; upstairs, the weights room and a sports hall with indoor volleyball and basketball courts.
-
-MOSQUÉE / MOSQUE (scene 37-mosquee)
-  FR: Un espace de prière sur le campus.
-  EN: A prayer space on campus.
-
-BUVETTE / CAFÉTÉRIA (scene 38-buvette-1 ; restauration scene 40-buvette-2)
-  FR: La buvette sert snacks et repas aux étudiants — le carrefour de la pause de midi, où ça sent le café et où se règlent la moitié des projets de groupe.
-  EN: The café serves snacks and meals to students — the midday crossroads that smells of coffee and where half the group projects actually get sorted.
-
-TERRAIN & JARDINS / FIELD & GARDENS (scene 30-terrain-de-foot)
-  FR: De grands espaces verts en plein air et un terrain de football — l'endroit où le campus respire entre deux cours.
-  EN: Wide open green space and a football pitch — where the campus breathes between classes.
-
-INTERNAT / CITÉ UNIVERSITAIRE (scene 26-cite-universitaire-l-internat)
-  FR: Une résidence étudiante sur le campus même. Pour les détails (places, conditions, tarifs) : https://www.mundiapolis.ma/contact
-  EN: A student residence right on campus. For details (spots, conditions, pricing): https://www.mundiapolis.ma/contact
 
 ## MISSION
 "Orienter, former les 'change makers' de demain et les accompagner
