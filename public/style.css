@@ -395,6 +395,3 @@ body::before {
 #av-input:focus{border-color:rgba(217,154,78,0.5)}
 #av-send{width:32px;height:32px;border:none;border-radius:2px;background:var(--terracotta);color:var(--paper);font-size:15px;cursor:pointer;transition:background .2s}
 #av-send:hover{background:var(--terracotta-d)}
-
-.msg-bubble .visit-btn{display:inline-flex;align-items:center;gap:.35rem;margin-top:.55rem;background:var(--ochre,#c8a96e);color:var(--ink,#1c1714);border:none;border-radius:3px;padding:.35rem .75rem;font-family:var(--sans);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s}
-.msg-bubble .visit-btn:hover{background:var(--terracotta,#c0624a);color:#fff}

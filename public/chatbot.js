@@ -5,45 +5,6 @@ const micBtn = document.getElementById('mic-btn');
 const presetsEl = document.getElementById('presets');
 const voiceToggle = document.getElementById('voice-toggle');
 
-// ---------- Tour-jump buttons ----------
-const SCENE_KEYWORDS = [
-  {rx:/biblioth[eè]|library/i,                       scene:'32-biblio-1',                    labelFr:'Voir la bibliothèque',            labelEn:'View the library'},
-  {rx:/salle de lecture|reading room/i,               scene:'33-biblio-2',                    labelFr:'Voir la salle de lecture',        labelEn:'View the reading room'},
-  {rx:/entr[ée]e|entrance|accueil/i,                  scene:'34-entree-1',                    labelFr:"Voir l'entrée",                   labelEn:'View the entrance'},
-  {rx:/[ée]lectronique|electronics?\s*lab/i,          scene:'0-labo-electronique',             labelFr:"Voir le labo d'électronique",     labelEn:'View the electronics lab'},
-  {rx:/labo|laboratoire|\blab\b/i,                    scene:'0-labo-electronique',             labelFr:'Voir les labos',                  labelEn:'View the labs'},
-  {rx:/g[ée]nie|engineering build|bâtiment g/i,       scene:'13-bg-rdc1',                     labelFr:'Voir le bâtiment Génie',          labelEn:'View the Engineering building'},
-  {rx:/amphi|amphith[eé][aâ]tre|amphitheater|conf[ée]rence/i, scene:'39-salle-de-conference', labelFr:"Voir l'amphithéâtre",             labelEn:'View the amphitheater'},
-  {rx:/caf[ée]t[ée]ria|cafeteria|buvette|cafet\b/i,  scene:'38-buvette-1',                   labelFr:'Voir la cafétéria',               labelEn:'View the cafeteria'},
-  {rx:/espace restauration|food court|resto\b/i,      scene:'40-buvette-2',                   labelFr:"Voir l'espace restauration",      labelEn:'View the food court'},
-  {rx:/mosqu[ée]e?|mosque|pri[eè]re/i,                scene:'37-mosquee',                     labelFr:'Voir la mosquée',                 labelEn:'View the mosque'},
-  {rx:/musculation|weights|muscu\b/i,                 scene:'43-salle-de-sport-musculation',  labelFr:'Voir la salle de musculation',    labelEn:'View the weight room'},
-  {rx:/piscine|pool|natation/i,                       scene:'46-salle-de-sport-piscine',      labelFr:'Voir la piscine',                 labelEn:'View the pool'},
-  {rx:/complexe sportif|salle de sport|\bsport\b|fitness|\bgym\b/i, scene:'41-salle-de-sport-', labelFr:'Voir le complexe sportif',    labelEn:'View the sports complex'},
-  {rx:/terrain|foot(?:ball)?|\bfield\b|jardin/i,      scene:'30-terrain-de-foot',             labelFr:'Voir le terrain / jardins',       labelEn:'View the football field'},
-  {rx:/internat|cit[ée] u|r[ée]sidence|\bdorm\b/i,   scene:'26-cite-universitaire-l-internat',labelFr:'Voir la cité universitaire',     labelEn:'View student housing'},
-  {rx:/administration|infirmerie|\bhealth\b/i,        scene:'12-administration',              labelFr:"Voir l'administration",           labelEn:'View the administration'},
-];
-
-function addTourButton(msgEl, replyText) {
-  for (const k of SCENE_KEYWORDS) {
-    if (k.rx.test(replyText)) {
-      const bubble = msgEl.querySelector('.msg-bubble');
-      if (!bubble) break;
-      const lang = detectLanguage(replyText);
-      const btn = document.createElement('button');
-      btn.className = 'visit-btn';
-      btn.innerHTML = (lang === 'en' ? k.labelEn : k.labelFr) + ' →';
-      btn.addEventListener('click', function () {
-        window.location.href = '/tour/index.html#scene=' + encodeURIComponent(k.scene);
-      });
-      bubble.appendChild(document.createElement('br'));
-      bubble.appendChild(btn);
-      break;
-    }
-  }
-}
-
 let history = [];
 let lastUserLang = null; // set by Whisper when user speaks; routes TTS language
 
@@ -125,8 +86,7 @@ async function sendMessage(text) {
 
     const data = await res.json();
     removeTypingIndicator();
-    const botMsg = addMessage(data.reply, 'bot');
-    addTourButton(botMsg, data.reply);
+    addMessage(data.reply, 'bot');
     speakText(data.reply);
 
     history.push({ role: 'user', content: message });
@@ -370,7 +330,7 @@ if (voiceToggle) {
     voiceEnabled = !voiceEnabled;
     voiceToggle.classList.toggle('muted', !voiceEnabled);
     voiceToggle.innerHTML = voiceEnabled ? '🔊' : '🔇';
-    voiceToggle.title = voiceEnabled ? 'Couper le son' : 'Activer la voix';
+    voiceToggle.title = voiceEnabled ? 'Mute voice' : 'Unmute voice';
     if (!voiceEnabled) stopSpeaking();
   });
 }
