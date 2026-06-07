@@ -22,8 +22,9 @@ MUNDIAPOLIS UNIVERSITY — VERIFIED FACTS (April 2026)
 1. Business School
    - Management, Marketing, Finance, Entrepreneurship
    
-2. École d'Ingénieurs (Engineering School)
-   - Computer Engineering, Civil Engineering, Industrial Engineering
+2. École d'Ingénierie — campus de Nouaceur (this tour)
+   - 3 engineering tracks: Informatique, Génie Industriel, Systèmes Aéronautiques
+   - + Licences en Informatique et Aéronautique. Cursus 2+3 (2 ans prépa + 3 ans cycle ingénieur)
    
 3. Institut des Sciences Politiques, Juridiques et Sociales
    - Law, Political Science, Social Sciences
@@ -40,6 +41,7 @@ MUNDIAPOLIS UNIVERSITY — VERIFIED FACTS (April 2026)
 - 14 continuing education programs
 
 ## ADMISSIONS PROCESS
+- Engineering (Nouaceur campus): Bac scientifique ou technique + dossier + entretien. mundiapolis.ma/contact
 ### For 1st year (Bac+0):
 - Must hold Moroccan or foreign Baccalauréat
 - Process: File review + oral interview with admissions jury
@@ -65,11 +67,19 @@ MUNDIAPOLIS UNIVERSITY — VERIFIED FACTS (April 2026)
 - Proximity to Casablanca's dynamic business environment
 
 ## CAMPUS
-- Located in Maarif neighborhood, Casablanca (central, urban campus)
-- Campus called "Campus Roudani"
-- Modern academic environment
-- Open house events regularly organized (Journées Portes Ouvertes)
-  - Recent: April 11, 2026 (10h-13h) and March 17, 2026 (10h30-15h30)
+- Tour campus: École d'Ingénierie, campus de Nouaceur (near Casablanca airport). All tour locations are here.
+- Admin/HQ address (not the tour campus): 380 Bd Roudani, Maarif, Casablanca.
+- Open house events (Journées Portes Ouvertes) regularly organized.
+
+## CAMPUS LOCATIONS
+- Bibliothèque: study space open to students (hours: check admin).
+- Labos: electronics/embedded systems incl. NXP lab — real hardware, student projects.
+- Amphithéâtre: campus conferences and events.
+- Complexe sportif: pool (ground floor); weights + indoor volleyball/basketball (upper floor).
+- Mosquée: prayer space on campus.
+- Buvette/cafétéria: snacks and meals — the midday meeting point.
+- Terrain/jardins: green space + football pitch.
+- Internat: student residence on campus; details -> mundiapolis.ma/contact.
 
 ## MISSION
 "Orienter, former les 'change makers' de demain et les accompagner

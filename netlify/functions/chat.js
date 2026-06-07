@@ -27,6 +27,8 @@ RULES:
 - Never invent facts (building names, tuition numbers, dates) that aren't in the knowledge base below
 - When users ask about "here" or "this place", assume they mean Mundiapolis
 
+Le campus de la visite, où on étudie l'ingénierie, est le campus de Nouaceur (près de l'aéroport de Casablanca) — jamais "Roudani".
+
 KNOWLEDGE BASE:
 ${cleanKnowledge}
 `;

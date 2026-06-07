@@ -8,6 +8,44 @@ const voiceToggle = document.getElementById('voice-toggle');
 let history = [];
 let lastUserLang = null; // set by Whisper when user speaks; routes TTS language
 
+// ---------- Tour-jump buttons (/amira has no iframe, navigate directly) ----------
+const SCENE_KEYWORDS = [
+  {rx:/biblioth[eè]|library/i,                        scene:'32-biblio-1',                    fr:'Voir la bibliothèque',          en:'View the library'},
+  {rx:/entr[ée]e|entrance|accueil/i,                  scene:'34-entree-1',                    fr:"Voir l'entrée",                 en:'View the entrance'},
+  {rx:/[ée]lectronique|electronics?\s*lab/i,           scene:'0-labo-electronique',             fr:"Voir le labo d'électronique",   en:'View the electronics lab'},
+  {rx:/\blabo\b|laboratoire|\blab\b/i,                scene:'0-labo-electronique',             fr:'Voir les labos',                en:'View the labs'},
+  {rx:/g[ée]nie|engineering build/i,                  scene:'13-bg-rdc1',                     fr:'Voir le bâtiment Génie',        en:'View the Engineering building'},
+  {rx:/amphi|amphith[eé]|conf[ée]rence/i,             scene:'39-salle-de-conference',          fr:"Voir l'amphithéâtre",           en:'View the amphitheater'},
+  {rx:/caf[ée]t[ée]ria|cafeteria|buvette|cafet\b/i,  scene:'38-buvette-1',                   fr:'Voir la cafétéria',             en:'View the cafeteria'},
+  {rx:/restauration|food court/i,                     scene:'40-buvette-2',                   fr:"Voir l'espace restauration",    en:'View the food court'},
+  {rx:/mosqu[ée]e?|mosque|pri[eè]re/i,                scene:'37-mosquee',                     fr:'Voir la mosquée',               en:'View the mosque'},
+  {rx:/musculation|muscu\b|weight/i,                  scene:'43-salle-de-sport-musculation',  fr:'Voir la salle de musculation',  en:'View the weight room'},
+  {rx:/piscine|pool|natation/i,                       scene:'46-salle-de-sport-piscine',      fr:'Voir la piscine',               en:'View the pool'},
+  {rx:/\bsport\b|complexe sportif|\bgym\b|fitness/i,  scene:'41-salle-de-sport-',             fr:'Voir le complexe sportif',      en:'View the sports complex'},
+  {rx:/terrain|foot(?:ball)?|\bfield\b|jardin/i,      scene:'30-terrain-de-foot',             fr:'Voir le terrain / jardins',     en:'View the field / gardens'},
+  {rx:/internat|cit[ée] u|r[ée]sidence|\bdorm\b/i,   scene:'26-cite-universitaire-l-internat',fr:'Voir la cité universitaire',   en:'View student housing'},
+  {rx:/administration|infirmerie/i,                   scene:'12-administration',              fr:"Voir l'administration",         en:'View the administration'},
+];
+
+function addTourButton(msgEl, replyText) {
+  for (const k of SCENE_KEYWORDS) {
+    if (k.rx.test(replyText)) {
+      const bubble = msgEl.querySelector('.msg-bubble');
+      if (!bubble) break;
+      const lang = detectLanguage(replyText);
+      const btn = document.createElement('button');
+      btn.className = 'visit-btn';
+      btn.innerHTML = (lang === 'en' ? k.en : k.fr) + ' →';
+      btn.addEventListener('click', function () {
+        window.location.href = '/tour/index.html#scene=' + encodeURIComponent(k.scene);
+      });
+      bubble.appendChild(document.createElement('br'));
+      bubble.appendChild(btn);
+      break;
+    }
+  }
+}
+
 // ---------- Audio unlock (browser autoplay policy) ----------
 let audioUnlocked = false;
 function unlockAudio() {
@@ -86,7 +124,8 @@ async function sendMessage(text) {
 
     const data = await res.json();
     removeTypingIndicator();
-    addMessage(data.reply, 'bot');
+    const botMsg = addMessage(data.reply, 'bot');
+    addTourButton(botMsg, data.reply);
     speakText(data.reply);
 
     history.push({ role: 'user', content: message });
